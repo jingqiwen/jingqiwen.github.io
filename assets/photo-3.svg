@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600">
+  <!-- 照片墙占位图 03：天空与风景风格；替换照片时删除本文件并在 config.js 修改路径 -->
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#7fd8ff"/>
+      <stop offset="1" stop-color="#eaf8ff"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="600" fill="url(#sky)"/>
+  <circle cx="640" cy="130" r="60" fill="#ffffff" opacity="0.95"/>
+  <path d="M0 420l140-150 130 120 150-170 170 160 210-130v350H0z" fill="#3fa9d8" opacity="0.55"/>
+  <path d="M0 470l160-120 120 100 160-140 170 130 190-90v150H0z" fill="#1e88b5" opacity="0.65"/>
+  <rect x="250" y="250" width="300" height="90" rx="18" fill="#ffffff" opacity="0.9"/>
+  <text x="400" y="290" text-anchor="middle" font-family="Microsoft YaHei, sans-serif" font-size="30" font-weight="bold" fill="#0288d1">照片占位 03</text>
+  <text x="400" y="322" text-anchor="middle" font-family="Microsoft YaHei, sans-serif" font-size="16" fill="#486581">天空 · 校园 · 生活</text>
+</svg>

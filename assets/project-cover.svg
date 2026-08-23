@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720">
+  <!-- 项目封面占位图：浅色电路风格；有真实截图后请替换并在 config.js 修改 cover 路径 -->
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#eaf8ff"/>
+      <stop offset="1" stop-color="#a9e2ff"/>
+    </linearGradient>
+  </defs>
+  <rect width="1280" height="720" fill="url(#bg)"/>
+  <g stroke="#29b6f6" stroke-width="5" fill="none" opacity="0.6">
+    <path d="M80 180h240l60-80h180l70 90h220l80-70h190M80 400h180l60 60h140l50-90h240l70 90h300"/>
+    <path d="M360 60v160M560 40v180M760 60v150M980 40v160M300 300v140M500 300v140M700 300v140M900 300v140"/>
+  </g>
+  <g fill="#0288d1">
+    <circle cx="360" cy="220" r="16"/><circle cx="560" cy="220" r="16"/>
+    <circle cx="760" cy="210" r="16"/><circle cx="980" cy="200" r="16"/>
+    <circle cx="300" cy="440" r="16"/><circle cx="500" cy="440" r="16"/>
+    <circle cx="700" cy="440" r="16"/><circle cx="900" cy="440" r="16"/>
+  </g>
+  <rect x="430" y="270" width="420" height="160" rx="28" fill="#ffffff" opacity="0.92"/>
+  <text x="640" y="340" text-anchor="middle" font-family="Microsoft YaHei, sans-serif" font-size="42" font-weight="bold" fill="#0288d1">项目封面占位</text>
+  <text x="640" y="390" text-anchor="middle" font-family="Microsoft YaHei, sans-serif" font-size="22" fill="#486581">请替换为项目截图 / 效果图</text>
+</svg>

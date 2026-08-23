@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600">
+  <!-- 照片墙占位图 02：团队合作风格；替换照片时删除本文件并在 config.js 修改路径 -->
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#c9efff"/>
+      <stop offset="1" stop-color="#eaf8ff"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="600" fill="url(#bg)"/>
+  <circle cx="640" cy="120" r="54" fill="#ffd166" opacity="0.9"/>
+  <g fill="#ffffff" stroke="#7fd8ff" stroke-width="6">
+    <circle cx="270" cy="230" r="58"/>
+    <circle cx="400" cy="210" r="66"/>
+    <circle cx="530" cy="230" r="58"/>
+  </g>
+  <g fill="#0288d1">
+    <path d="M200 390c8-62 40-96 72-96s64 34 72 96z"/>
+    <path d="M330 380c8-66 40-102 72-102s64 36 72 102z"/>
+    <path d="M460 390c8-62 40-96 72-96s64 34 72 96z"/>
+  </g>
+  <rect x="240" y="430" width="320" height="90" rx="18" fill="#ffffff" opacity="0.9"/>
+  <text x="400" y="470" text-anchor="middle" font-family="Microsoft YaHei, sans-serif" font-size="30" font-weight="bold" fill="#0288d1">照片占位 02</text>
+  <text x="400" y="502" text-anchor="middle" font-family="Microsoft YaHei, sans-serif" font-size="16" fill="#486581">和伙伴们一起</text>
+</svg>

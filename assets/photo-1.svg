@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600">
+  <!-- 照片墙占位图 01：天蓝电路板风格；替换照片时删除本文件并在 config.js 修改路径 -->
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#dff4ff"/>
+      <stop offset="1" stop-color="#8fd9ff"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="600" fill="url(#bg)"/>
+  <g stroke="#1e9fd8" stroke-width="4" fill="none" opacity="0.75">
+    <path d="M40 120h180l40-50h140l50 70h150M40 300h120l40 50h80l30-70h160l60 80h150M40 480h220l50-60h160l40 60h170"/>
+    <path d="M280 20v120M460 40v160M620 40v140M200 240v160M420 240v160M640 240v160"/>
+  </g>
+  <g fill="#0288d1">
+    <circle cx="280" cy="140" r="12"/><circle cx="460" cy="200" r="12"/>
+    <circle cx="620" cy="180" r="12"/><circle cx="200" cy="400" r="12"/>
+    <circle cx="420" cy="400" r="12"/><circle cx="640" cy="400" r="12"/>
+  </g>
+  <rect x="250" y="220" width="300" height="120" rx="20" fill="#ffffff" opacity="0.88"/>
+  <text x="400" y="272" text-anchor="middle" font-family="Microsoft YaHei, sans-serif" font-size="34" font-weight="bold" fill="#0288d1">照片占位 01</text>
+  <text x="400" y="312" text-anchor="middle" font-family="Microsoft YaHei, sans-serif" font-size="18" fill="#486581">把照片放到 assets 文件夹后替换</text>
+</svg>
