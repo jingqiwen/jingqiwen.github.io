@@ -15,8 +15,8 @@
   --bg: #f4faff;
   --bg-soft: #e9f5ff;
 
-  /* 交替版块的半透明遮罩：让全站星空从所有版块透出来 */
-  --section-veil: rgba(238, 248, 255, 0.58);
+  /* 交替版块的半透明遮罩：尽量淡，保证亮色场景连续透出 */
+  --section-veil: rgba(255, 255, 255, 0.24);
 
   /* 卡片：白色半透明玻璃拟态 */
   --surface: rgba(255, 255, 255, 0.72);
@@ -29,10 +29,10 @@
   --secondary: #7fe0ff;
   --gradient: linear-gradient(135deg, #00b4ff 0%, #7fe0ff 100%);
 
-  /* 文字颜色 */
-  --text: #102a43;
-  --text-secondary: #486581;
-  --text-weak: #6b8aa3;
+  /* 文字颜色：亮色主题下加深，保证在天空背景上清晰可读 */
+  --text: #0a2a45;
+  --text-secondary: #23486a;
+  --text-weak: #3d5f7d;
 
   /* 边框、阴影 */
   --border: rgba(41, 182, 246, 0.20);
@@ -706,11 +706,9 @@ body.earth-cursor-active * {
     radial-gradient(110% 80% at 18% 84%, rgba(5, 24, 48, 0.50), transparent 60%);
 }
 
-/* 浅色主题：首屏保持清晨天空的通透感 */
+/* 浅色主题：首屏只盖一层极淡的白纱，让后面的“宇宙→天空”渐变完整透出 */
 :root[data-theme="light"] .hero {
-  background:
-    radial-gradient(110% 80% at 72% 16%, rgba(226, 247, 255, 0.35), transparent 58%),
-    radial-gradient(110% 80% at 18% 84%, rgba(255, 255, 255, 0.30), transparent 60%);
+  background: radial-gradient(120% 90% at 50% 0%, rgba(255, 255, 255, 0.20), transparent 60%);
 }
 
 /* 粒子背景层：固定在首屏内部 */
@@ -2427,12 +2425,9 @@ body.earth-cursor-active * {
 /* ---------------------------------------------------------------------
  * 十四点五、视觉升级：全局光影与发光动效
  * --------------------------------------------------------------------- */
-/* 交替版块背景：只叠加很淡的柔光遮罩，让全站星空从每个版块透出来 */
+/* 交替版块背景：亮色下只盖极淡的白色纱，让宇宙→天空→大地渐变连续透出 */
 .section-alt {
-  background:
-    radial-gradient(600px 380px at 15% 12%, rgba(127, 224, 255, 0.16), transparent 65%),
-    radial-gradient(620px 420px at 88% 82%, rgba(255, 255, 255, 0.22), transparent 65%),
-    var(--section-veil);
+  background: var(--section-veil);
 }
 
 :root[data-theme="dark"] .section-alt {
@@ -2440,6 +2435,12 @@ body.earth-cursor-active * {
     radial-gradient(600px 380px at 15% 12%, rgba(0, 123, 214, 0.14), transparent 65%),
     radial-gradient(620px 420px at 88% 82%, rgba(20, 94, 160, 0.12), transparent 65%),
     var(--section-veil);
+}
+
+/* 亮色主题版块标题：加深颜色，去掉过重的发光 */
+:root[data-theme="light"] .section-head .section-title {
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.55);
+  color: #0a2a45;
 }
 
 /* 版块标题：天蓝发光 */
@@ -2763,6 +2764,32 @@ body.earth-cursor-active * {
 
 .status-serial { background: rgba(41, 182, 246, 0.12); border-color: rgba(41, 182, 246, 0.35); color: var(--primary-strong); }
 :root[data-theme="dark"] .status-serial { color: #6dffc0; }
+
+/* 模式角标：放在屏幕外、游戏机顶部，字体大且醒目 */
+.snake-mode-badge {
+  position: relative;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  margin: 2px 0 8px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: rgba(41, 182, 246, 0.16);
+  border: 1px solid rgba(41, 182, 246, 0.42);
+  color: var(--primary-strong);
+  font-size: 1rem;
+  font-weight: 900;
+  letter-spacing: 1px;
+  box-shadow: 0 4px 12px rgba(41, 182, 246, 0.18);
+}
+
+.snake-mode-badge.manual {
+  background: rgba(255, 209, 102, 0.18);
+  border-color: rgba(255, 209, 102, 0.55);
+  color: #b97b00;
+}
+
+:root[data-theme="dark"] .snake-mode-badge.manual { color: #ffd166; }
 
 /* 智慧之星与提示 */
 .wisdom-zone {

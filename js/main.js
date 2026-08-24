@@ -473,8 +473,9 @@
       "    </div>" +
       '    <div class="wisdom-zone">' +
       '      <div class="wisdom-star" id="wisdom-star" title="智慧之星">★</div>' +
-      '      <div class="wisdom-hint" id="wisdom-hint">' + escapeHtml(config.starHint || "点亮：条件死亡一次，并通关一次后智慧之星将会被点亮") + "</div>" +
+      '      <div class="wisdom-hint" id="wisdom-hint">' + escapeHtml(config.starHint || "点亮条件：玩家先将贪吃蛇通关失败一次，随后再通关成功一次") + "</div>" +
       "    </div>" +
+      '    <div class="snake-mode-badge" id="snake-mode">AI插件托管中</div>' +
       '    <div class="console-screen">' +
       '      <div class="screen-vent vent-1"></div><div class="screen-vent vent-2"></div>' +
       '      <div class="snake-canvas-wrap" id="snake-wrap"><canvas id="snake-canvas" aria-label="贪吃蛇小游戏画布"></canvas></div>' +
@@ -516,6 +517,7 @@
       capacitorBtn: $("snake-capacitor"),
       starEl: $("wisdom-star"),
       hintEl: $("wisdom-hint"),
+      modeEl: $("snake-mode"),
       cardEl: $("hero-right") ? $("hero-right").querySelector(".snake-card") : null,
       config: config
     });
@@ -536,6 +538,7 @@
     this.capacitorBtn = options.capacitorBtn;
     this.starEl = options.starEl;
     this.hintEl = options.hintEl;
+    this.modeEl = options.modeEl;
     this.cardEl = options.cardEl;
     this.config = options.config || {};
 
@@ -585,17 +588,14 @@
     this.deathParticleRaf = 0;
     this.achievements = this.config.achievements || [];
 
-    // 重新进入/刷新网页时，恢复死亡次数、通关记录、蛇身编号和智慧之星
+    // 智慧之星：每次进入/刷新网页都从“熄灭”状态重新开始，
+    // 本局需要先死一次、再通关一次才能点亮（不读取历史点亮状态）
     this.wisdomLit = false;
     try {
+      // 只恢复死亡累计记录与蛇身编号（成就记录不丢失），智慧之星进度不恢复
       const saved = JSON.parse(localStorage.getItem("wjq-snake-progress") || "{}");
       this.deathCount = Number(saved.deathCount) || 0;
-      this.hasPassed = !!(saved.hasPassed);
-      this.firstDeathAt = Number(saved.firstDeathAt) || 0;
-      this.firstPassAt = Number(saved.firstPassAt) || 0;
       this.serial = Number(saved.serial) || (this.deathCount + 1);
-      // 智慧之星：必须“先死一次，再通关一次”，即首次通关时间晚于首次死亡时间
-      this.wisdomLit = this.firstDeathAt > 0 && this.firstPassAt > 0 && this.firstPassAt > this.firstDeathAt;
     } catch (error) {
       // 没有记录或解析失败时，按全新进度开始
     }
@@ -788,18 +788,14 @@
     if (this.scoreEl) this.scoreEl.textContent = "长度 " + this.score;
   };
 
-  // 保存进度：死亡次数 / 通关记录 / 蛇身编号 / 智慧之星，刷新后不丢失
+  // 保存进度：只保存死亡累计次数与蛇身编号（智慧之星每次进入网页都重新点亮）
   SnakeGame.prototype.saveProgress = function () {
     try {
       localStorage.setItem(
         "wjq-snake-progress",
         JSON.stringify({
           deathCount: this.deathCount,
-          hasPassed: this.hasPassed,
-          firstDeathAt: this.firstDeathAt,
-          firstPassAt: this.firstPassAt,
-          serial: this.serial,
-          wisdomLit: this.wisdomLit
+          serial: this.serial
         })
       );
     } catch (error) {
@@ -834,6 +830,11 @@
   SnakeGame.prototype.updateModeUI = function () {
     this.autoBtn.textContent = this.mode === "auto" ? "自动游动" : "手动模式";
     this.autoBtn.classList.toggle("active", this.mode === "auto");
+    // 模式角标放在游戏机内部屏幕之外，不遮挡游戏画面
+    if (this.modeEl) {
+      this.modeEl.textContent = this.mode === "auto" ? "AI插件托管中" : "手动游玩模式";
+      this.modeEl.classList.toggle("manual", this.mode === "manual");
+    }
     // 电容技能只在手动模式可用
     this.capacitorBtn.disabled = this.mode !== "manual" || !this.capacitorReady;
     this.capacitorBtn.classList.toggle("ready", this.capacitorReady && this.mode === "manual");
@@ -1216,9 +1217,6 @@
 
     ctx.clearRect(0, 0, size, size);
 
-    const styles = getComputedStyle(document.documentElement);
-    const text = styles.getPropertyValue("--text").trim() || "#e6f4ff";
-
     // 1. 淡网格
     ctx.strokeStyle = "rgba(46, 230, 168, 0.10)";
     ctx.lineWidth = 1;
@@ -1324,17 +1322,6 @@
       ctx.fillStyle = "#ffd166";
       ctx.font = "600 " + Math.round(cell * 0.34) + "px sans-serif";
       ctx.fillText("下一台：" + this.serialText(), size / 2, size / 2 + cell * 1.5);
-    }
-
-    // 6. 模式角标
-    if (this.alive) {
-      ctx.font = Math.round(cell * 0.32) + "px sans-serif";
-      ctx.textAlign = "left";
-      ctx.textBaseline = "top";
-      ctx.fillStyle = text;
-      ctx.globalAlpha = 0.55;
-      ctx.fillText(this.mode === "auto" ? "AI 自动模式" : "手动模式", cell * 0.4, cell * 0.35);
-      ctx.globalAlpha = 1;
     }
   };
 

@@ -61,8 +61,7 @@
     // ---- 大地层（页面底部，高度最低） ----
     { type: "tree",     emoji: "🌳", x: 0.030, docY: 0.855, size: 38, depth: 0.20 },
     { type: "tree",     emoji: "🌲", x: 0.970, docY: 0.870, size: 34, depth: 0.20 },
-    { type: "robot",    emoji: "🤖", x: 0.030, docY: 0.900, size: 30, depth: 0.22, label: "智能机器人" },
-    { type: "tower",    emoji: "📡", x: 0.970, docY: 0.910, size: 32, depth: 0.22, label: "智能基站" },
+    { type: "tower",    emoji: "📡", x: 0.970, docY: 0.900, size: 32, depth: 0.22, label: "智能基站" },
     { type: "tree",     emoji: "🌳", x: 0.030, docY: 0.940, size: 34, depth: 0.18 }
   ];
 
@@ -80,10 +79,10 @@
     // 顶部看到宇宙，中部看到天空，底部看到大地。
     const g = ctx.createLinearGradient(0, -scrollY, 0, docH - scrollY);
     g.addColorStop(0.00, "#050a18");   // 宇宙深空
-    g.addColorStop(0.20, "#0c2242");   // 宇宙 → 天空过渡
-    g.addColorStop(0.38, "#6fc3ff");   // 天空蓝
-    g.addColorStop(0.70, "#bfe9ff");   // 浅天蓝
-    g.addColorStop(0.84, "#b6dfaa");   // 天空 → 大地
+    g.addColorStop(0.08, "#0c2242");   // 宇宙 → 天空过渡（尽早进入天空，保证文字清晰）
+    g.addColorStop(0.18, "#6fc3ff");   // 天空蓝
+    g.addColorStop(0.55, "#bfe9ff");   // 浅天蓝
+    g.addColorStop(0.80, "#b6dfaa");   // 天空 → 大地
     g.addColorStop(1.00, "#5da45d");   // 大地绿
     ctx.fillStyle = g;
     ctx.fillRect(0, 0, w, h);
