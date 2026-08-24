@@ -26,10 +26,10 @@
     renderHero();          // 首屏（含贪吃蛇）
     renderSectionHeads();  // 各版块标题
     renderAbout();         // 关于我 + 教育经历
-    renderSkills();        // 技能
-    renderResearch();      // 项目经历
-    renderAwards();        // 参加比赛及获奖情况
+    renderSkills();        // 技能（单列进度条）
+    renderResearch();      // 学习经历
     renderProjects();      // 项目成果展示及资料
+    renderAwards();        // 参加比赛及获奖情况（在项目成果之后）
     renderNotes();         // 我的笔记
     renderGallery();       // 光影瞬间照片墙
     renderContact();       // 联系我
@@ -229,12 +229,12 @@
       }
     });
 
-    // 平滑跟随：地球不是生硬地贴在鼠标上，而是像小行星一样飘过去
+    // 快速跟随：地球几乎贴在鼠标热点上，只保留极轻微平滑，不会让鼠标“变慢”
     function follow() {
-      currentX += (targetX - currentX) * 0.16;
-      currentY += (targetY - currentY) * 0.16;
-      // 42 是光标尺寸的一半，保证地球中心对准鼠标热点
-      cursor.style.transform = "translate3d(" + (currentX - 21) + "px," + (currentY - 21) + "px,0)";
+      currentX += (targetX - currentX) * 0.7;
+      currentY += (targetY - currentY) * 0.7;
+      // 14 是小号地球光标尺寸（28px）的一半，保证中心对准鼠标热点
+      cursor.style.transform = "translate3d(" + (currentX - 14) + "px," + (currentY - 14) + "px,0)";
       requestAnimationFrame(follow);
     }
     requestAnimationFrame(follow);
@@ -284,9 +284,8 @@
     const toc = SITE_CONFIG.toc || {};
     if (toc.panelTitle) $("toc-title").textContent = toc.panelTitle;
     if (toc.panelSubtitle) $("toc-subtitle").textContent = toc.panelSubtitle;
-    if (toc.celestialTitle) $("toc-celestial-title").textContent = toc.celestialTitle;
 
-    // 全部版块跳转按钮
+    // 全部版块跳转按钮：link.icon（金星/狮子座/火星/土星/人造卫星等）直接作为每项的前缀
     $("toc-links").innerHTML = (SITE_CONFIG.nav.links || [])
       .map(
         (link) =>
@@ -294,18 +293,6 @@
           '  <span class="toc-link-icon">' + escapeHtml(link.icon || "•") + "</span>" +
           "  <span>" + escapeHtml(link.text) + "</span>" +
           "</a>"
-      )
-      .join("");
-
-    // 结尾的银河天体导航按钮（金星/火星/木星/土星/人造卫星/狮子座等）
-    $("toc-celestial").innerHTML = (toc.celestial || [])
-      .map(
-        (item) =>
-          '<button type="button" class="celestial-btn" data-target="' + escapeHtml(item.id) + '" title="' +
-          escapeHtml(item.name + " · " + (item.tip || "前往该版块")) + '">' +
-          '  <span class="celestial-icon">' + escapeHtml(item.icon || "🌟") + "</span>" +
-          '  <span class="celestial-name">' + escapeHtml(item.name) + "</span>" +
-          "</button>"
       )
       .join("");
   }
@@ -970,31 +957,32 @@
   }
 
   /* ------------------------------------------------------------------
-   * 六、渲染技能
+   * 六、渲染技能（单列：从上到下一行一个技能，每个进度条占一行）
    * ------------------------------------------------------------------ */
   function renderSkills() {
-    const skills = SITE_CONFIG.skills || { groups: [] };
+    const skills = SITE_CONFIG.skills || { items: [] };
     const grid = $("skills-grid");
     if (!grid) return;
 
-    grid.innerHTML = (skills.groups || [])
-      .map(
-        (group) =>
-          '<div class="skill-card glass-card reveal">' +
-          '  <div class="skill-category"><span class="skill-icon">' + escapeHtml(group.icon || "⭐") + "</span>" +
-          "    " + escapeHtml(group.category) + "</div>" +
-          (group.items || [])
-            .map(
-              (item) =>
-                '<div class="skill-item">' +
-                '  <div class="skill-name"><span>' + escapeHtml(item.name) + "</span><span>" + Number(item.level || 0) + "%</span></div>" +
-                '  <div class="skill-bar"><div class="skill-fill" data-level="' + Number(item.level || 0) + '"></div></div>' +
-                "</div>"
-            )
-            .join("") +
-          "</div>"
-      )
-      .join("");
+    // 一行一个技能：名称/熟练度说明/百分比在上，进度条在下方独占一行
+    grid.innerHTML =
+      '<div class="skills-list">' +
+      (skills.items || [])
+        .map(
+          (item) =>
+            '<div class="skill-row reveal">' +
+            '  <div class="skill-row-top">' +
+            '    <span class="skill-name">' + escapeHtml(item.name) + "</span>" +
+            '    <span class="skill-meta">' +
+            (item.note ? '<span class="skill-note">' + escapeHtml(item.note) + "</span>" : "") +
+            '    <span class="skill-percent">' + Number(item.level || 0) + "%</span>" +
+            "    </span>" +
+            "  </div>" +
+            '  <div class="skill-bar"><div class="skill-fill" data-level="' + Number(item.level || 0) + '"></div></div>' +
+            "</div>"
+        )
+        .join("") +
+      "</div>";
 
     // 进度条在进入屏幕时再填充，动画更自然
     const fills = grid.querySelectorAll(".skill-fill");
@@ -1017,7 +1005,7 @@
   }
 
   /* ------------------------------------------------------------------
-   * 七、渲染科研经历时间线
+   * 七、渲染学习经历时间线
    * ------------------------------------------------------------------ */
   function renderResearch() {
     const research = SITE_CONFIG.research || { items: [] };
@@ -1349,15 +1337,6 @@
     // 点击目录里的版块链接后：跳转并收起面板（移动端不挡内容）
     tocPanel.querySelectorAll(".toc-link").forEach((link) => {
       link.addEventListener("click", () => setTocOpen(false));
-    });
-
-    // 银河天体按钮：点击后跳转到对应版块
-    tocPanel.querySelectorAll(".celestial-btn").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        const target = document.getElementById(btn.dataset.target);
-        if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
-        setTocOpen(false);
-      });
     });
 
     // 2. 汉堡菜单开关

@@ -64,8 +64,15 @@
   </header>
 
   <!-- ================================================================
+       全站星空层：固定在视口最底层，覆盖首页和所有版块。
+       three-bg.js 把 canvas 画到这里：鼠标静止时星星自动流动/闪烁，
+       鼠标（地球光标）移动时整片星空跟随视角变化。
+       ================================================================ -->
+  <div class="star-field" id="star-field" aria-hidden="true"></div>
+
+  <!-- ================================================================
        左侧“银河目录”跳转栏：固定悬浮按钮 + 可展开面板
-       任何时候都能一键跳转到任何版块，结尾带银河天体导航
+       每个版块跳转按钮前都有金星/狮子座/火星/土星等天体图标
        ================================================================ -->
   <button class="toc-toggle" id="toc-toggle" type="button" aria-label="打开银河目录" aria-expanded="false">
     <span class="toc-toggle-icon">🪐</span>
@@ -80,11 +87,8 @@
       </div>
       <button class="toc-close" id="toc-close" type="button" aria-label="关闭银河目录">×</button>
     </div>
-    <!-- 各版块跳转按钮：由 config.js 渲染 -->
+    <!-- 各版块跳转按钮：天体图标直接作为每个目录项的前缀，由 config.js 渲染 -->
     <nav class="toc-links" id="toc-links" aria-label="版块目录"></nav>
-    <!-- 银河天体导航：金星/火星/木星/土星/人造卫星/狮子座等 -->
-    <div class="toc-celestial-title" id="toc-celestial-title">🌌 银河天体导航</div>
-    <div class="toc-celestial" id="toc-celestial"></div>
   </aside>
 
   <main>
@@ -93,7 +97,7 @@
          背景：夜空星光（three-bg.js 绘制，星星会跟随鼠标/地球光标移动）
          ================================================================ -->
     <section class="hero" id="home">
-      <!-- 粒子背景容器：canvas 由 three-bg.js 自动创建并塞进来 -->
+      <!-- 首屏光影装饰层：光斑/光束/光尘/流星（星空 canvas 已移到全站 #star-field 层） -->
       <div class="hero-bg" id="hero-bg" aria-hidden="true">
         <!-- 动态光影层：大光斑 + 光束 + 光尘，营造空气感（CSS 动画） -->
         <div class="light-orb orb-1"></div>
@@ -146,7 +150,7 @@
     </section>
 
     <!-- ================================================================
-         项目经历：竖向时间线
+         学习经历：竖向时间线
          ================================================================ -->
     <section class="section" id="research">
       <div class="container">
@@ -156,23 +160,23 @@
     </section>
 
     <!-- ================================================================
-         参加比赛及获奖情况：获奖卡片网格
-         ================================================================ -->
-    <section class="section section-alt" id="awards">
-      <div class="container">
-        <div class="section-head" data-head="awards"></div>
-        <div class="awards-grid" id="awards-grid"></div>
-      </div>
-    </section>
-
-    <!-- ================================================================
          项目成果展示及资料：分类筛选 + 项目卡片网格
          ================================================================ -->
-    <section class="section" id="projects">
+    <section class="section section-alt" id="projects">
       <div class="container">
         <div class="section-head" data-head="projects"></div>
         <div class="filter-bar" id="project-filters" role="tablist" aria-label="项目分类筛选"></div>
         <div class="project-grid" id="project-grid"></div>
+      </div>
+    </section>
+
+    <!-- ================================================================
+         参加比赛及获奖情况：获奖卡片网格（位于项目成果展示之后）
+         ================================================================ -->
+    <section class="section" id="awards">
+      <div class="container">
+        <div class="section-head" data-head="awards"></div>
+        <div class="awards-grid" id="awards-grid"></div>
       </div>
     </section>
 

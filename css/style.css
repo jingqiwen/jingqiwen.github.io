@@ -15,6 +15,9 @@
   --bg: #f4faff;
   --bg-soft: #e9f5ff;
 
+  /* 交替版块的半透明遮罩：让全站星空从所有版块透出来 */
+  --section-veil: rgba(238, 248, 255, 0.58);
+
   /* 卡片：白色半透明玻璃拟态 */
   --surface: rgba(255, 255, 255, 0.72);
   --surface-solid: #ffffff;
@@ -53,6 +56,9 @@
   /* 深色主题：夜空蓝，星星更明显 */
   --bg: #081426;
   --bg-soft: #0c1e38;
+
+  /* 交替版块的半透明遮罩：保证深色文字可读，同时星光透出 */
+  --section-veil: rgba(8, 20, 38, 0.52);
 
   --surface: rgba(16, 36, 62, 0.72);
   --surface-solid: #10243e;
@@ -127,6 +133,35 @@ body::before {
     radial-gradient(600px 480px at 18% 82%, rgba(38, 105, 168, 0.12), transparent 60%),
     radial-gradient(520px 420px at 78% 88%, rgba(6, 88, 150, 0.14), transparent 60%),
     linear-gradient(180deg, var(--bg) 0%, var(--bg-soft) 100%);
+}
+
+/* 全站星空层：固定在视口上，首页和所有版块共用同一片星空 */
+.star-field {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none; /* 鼠标事件全部穿透到页面内容 */
+  overflow: hidden;
+}
+
+.star-field canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* 正文内容整体浮在星空层之上（背景透明处能看到星星） */
+main,
+.footer {
+  position: relative;
+  z-index: 1;
+}
+
+/* 各版块本身保持透明，让星空透出来；交替版块只盖一层很淡的遮罩 */
+.section {
+  background: transparent;
 }
 
 img {
@@ -511,9 +546,16 @@ button {
 }
 
 .toc-link-icon {
-  width: 26px;
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   text-align: center;
-  font-size: 1rem;
+  font-size: 1.15rem;
+  border-radius: 50%;
+  background: rgba(127, 224, 255, 0.14);
+  border: 1px solid var(--border);
 }
 
 /* 目录结尾：银河天体导航 */
@@ -554,14 +596,14 @@ button {
 .celestial-icon { font-size: 1.35rem; line-height: 1; }
 .celestial-name { font-size: 0.7rem; font-weight: 600; }
 
-/* 地球鼠标：进入网站后替换默认鼠标，持续自转 */
+/* 地球鼠标：进入网站后替换默认鼠标，持续自转（28px 小号，跟随迅速） */
 .earth-cursor {
   position: fixed;
   left: 0;
   top: 0;
   z-index: 400;
-  width: 42px;
-  height: 42px;
+  width: 28px;
+  height: 28px;
   margin: 0;
   pointer-events: none;
   opacity: 0;
@@ -570,19 +612,19 @@ button {
 
 .earth-cursor-spin {
   position: absolute;
-  inset: 2px;
+  inset: 1px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 30px;
+  font-size: 20px;
   line-height: 1;
-  filter: drop-shadow(0 0 8px rgba(127, 224, 255, 0.85));
+  filter: drop-shadow(0 0 6px rgba(127, 224, 255, 0.85));
   animation: earth-spin 7s linear infinite;
 }
 
 .earth-cursor-orbit {
   position: absolute;
-  inset: -5px;
+  inset: -3px;
   border: 1px dashed rgba(127, 216, 255, 0.55);
   border-radius: 50%;
   animation: earth-orbit 4.5s linear infinite;
@@ -590,7 +632,7 @@ button {
 
 .earth-cursor-glow {
   position: absolute;
-  inset: 4px;
+  inset: 3px;
   border-radius: 50%;
   background: radial-gradient(circle, rgba(127, 224, 255, 0.5), transparent 70%);
   animation: cursor-glow 2.4s ease-in-out infinite;
@@ -612,7 +654,7 @@ button {
 }
 
 /* 悬停可点击元素时：地球放大一点、轨道更亮 */
-.earth-cursor.cursor-hover .earth-cursor-spin { font-size: 36px; }
+.earth-cursor.cursor-hover .earth-cursor-spin { font-size: 24px; }
 .earth-cursor.cursor-hover .earth-cursor-orbit { border-color: rgba(127, 224, 255, 0.95); box-shadow: 0 0 14px rgba(127, 224, 255, 0.6); }
 
 /* 启用地球鼠标后隐藏系统默认光标 */
@@ -639,18 +681,18 @@ body.earth-cursor-active * {
   overflow: hidden;
 }
 
-/* 深色主题：首屏叠加更深的夜空渐变，让星光更明显 */
+/* 深色主题：首屏叠加轻微夜空渐变，星光层仍在下面透出 */
 :root[data-theme="dark"] .hero {
   background:
-    radial-gradient(110% 80% at 72% 16%, rgba(11, 39, 74, 0.72), transparent 58%),
-    radial-gradient(110% 80% at 18% 84%, rgba(5, 24, 48, 0.86), transparent 60%);
+    radial-gradient(110% 80% at 72% 16%, rgba(11, 39, 74, 0.42), transparent 58%),
+    radial-gradient(110% 80% at 18% 84%, rgba(5, 24, 48, 0.50), transparent 60%);
 }
 
 /* 浅色主题：首屏保持清晨天空的通透感 */
 :root[data-theme="light"] .hero {
   background:
-    radial-gradient(110% 80% at 72% 16%, rgba(226, 247, 255, 0.65), transparent 58%),
-    radial-gradient(110% 80% at 18% 84%, rgba(255, 255, 255, 0.55), transparent 60%);
+    radial-gradient(110% 80% at 72% 16%, rgba(226, 247, 255, 0.35), transparent 58%),
+    radial-gradient(110% 80% at 18% 84%, rgba(255, 255, 255, 0.30), transparent 60%);
 }
 
 /* 粒子背景层：固定在首屏内部 */
@@ -1183,7 +1225,7 @@ body.earth-cursor-active * {
 .section { padding: 100px 0; }
 
 /* 隔一个版块换一种浅色背景，形成节奏 */
-.section-alt { background: var(--bg-soft); }
+.section-alt { background: var(--section-veil); }
 
 .section-head {
   text-align: center;
@@ -1364,36 +1406,72 @@ body.earth-cursor-active * {
  * 七、技能版块
  * --------------------------------------------------------------------- */
 .skills-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
-  gap: 26px;
+  max-width: 860px;
+  margin: 0 auto;
 }
 
-.skill-card { padding: 28px; }
+.skills-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
 
-.skill-category {
+.skill-row {
+  padding: 14px 20px 16px;
+  border-radius: 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: 0 6px 18px rgba(41, 143, 202, 0.10);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
+}
+
+.skill-row:hover {
+  transform: translateX(5px);
+  border-color: var(--border-strong);
+  box-shadow: 0 10px 24px rgba(41, 182, 246, 0.20);
+}
+
+.skill-row-top {
   display: flex;
   align-items: center;
-  gap: 10px;
-  font-size: 1.1rem;
-  font-weight: 700;
-  margin-bottom: 20px;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
 }
-
-.skill-category .skill-icon { font-size: 1.4rem; }
-
-.skill-item { margin-bottom: 16px; }
-.skill-item:last-child { margin-bottom: 0; }
 
 .skill-name {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.9rem;
-  font-weight: 600;
-  margin-bottom: 6px;
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: var(--text);
 }
 
-.skill-name span:last-child { color: var(--text-weak); font-weight: 500; }
+.skill-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.skill-note {
+  padding: 2px 12px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--primary-strong);
+  background: var(--surface-solid);
+  border: 1px solid var(--border);
+}
+
+.skill-percent {
+  min-width: 44px;
+  text-align: right;
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: var(--primary-strong);
+}
 
 /* 熟练度进度条 */
 .skill-bar {
@@ -1896,19 +1974,19 @@ body.earth-cursor-active * {
 /* ---------------------------------------------------------------------
  * 十四点五、视觉升级：全局光影与发光动效
  * --------------------------------------------------------------------- */
-/* 交替版块背景增加大范围柔光，避免单调 */
+/* 交替版块背景：只叠加很淡的柔光遮罩，让全站星空从每个版块透出来 */
 .section-alt {
   background:
-    radial-gradient(600px 380px at 15% 12%, rgba(127, 224, 255, 0.22), transparent 65%),
-    radial-gradient(620px 420px at 88% 82%, rgba(255, 255, 255, 0.38), transparent 65%),
-    var(--bg-soft);
+    radial-gradient(600px 380px at 15% 12%, rgba(127, 224, 255, 0.16), transparent 65%),
+    radial-gradient(620px 420px at 88% 82%, rgba(255, 255, 255, 0.22), transparent 65%),
+    var(--section-veil);
 }
 
 :root[data-theme="dark"] .section-alt {
   background:
-    radial-gradient(600px 380px at 15% 12%, rgba(0, 123, 214, 0.16), transparent 65%),
-    radial-gradient(620px 420px at 88% 82%, rgba(20, 94, 160, 0.14), transparent 65%),
-    var(--bg-soft);
+    radial-gradient(600px 380px at 15% 12%, rgba(0, 123, 214, 0.14), transparent 65%),
+    radial-gradient(620px 420px at 88% 82%, rgba(20, 94, 160, 0.12), transparent 65%),
+    var(--section-veil);
 }
 
 /* 版块标题：天蓝发光 */

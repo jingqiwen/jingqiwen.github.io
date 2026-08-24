@@ -1,8 +1,8 @@
 # 个人学术主页（GitHub Pages 版）
 
-科技风 · 天空蓝柔和星点 · 响应式个人学术主页。
+科技风 · 全站星空背景 · 地球光标 · 响应式个人学术主页。
 
-功能包含：个人简历（基本信息 / 技能 / 科研经历）、社交链接、项目展示、贪吃蛇装饰小游戏、明暗主题切换、不蒜子访问量统计、光影瞬间照片墙、照片灯箱、移动端适配。
+功能包含：个人简历（基本信息 / 技能单列进度条 / 学习经历）、银河跳转目录、项目成果展示及资料、比赛及获奖、我的笔记、社交链接、贪吃蛇装饰小游戏、明暗主题切换、不蒜子访问量统计、光影瞬间照片墙、照片灯箱、移动端适配。星空背景固定覆盖所有版块：鼠标静止时自动流动，鼠标移动时跟随视角变化。
 
 ---
 
@@ -18,11 +18,14 @@
 
 | 想改什么 | 去哪里改 |
 |---|---|
-| 姓名、学校、专业、简介 | `SITE_CONFIG.hero`、`SITE_CONFIG.about` |
+| 姓名、专业、兴趣爱好、简介 | `SITE_CONFIG.hero`、`SITE_CONFIG.about` |
 | 社交链接（GitHub / QQ / 邮箱 / B站） | `SITE_CONFIG.hero.socials`、`SITE_CONFIG.contact` |
-| 技能与熟练度 | `SITE_CONFIG.skills` |
-| 教育 / 科研经历 | `SITE_CONFIG.education`、`SITE_CONFIG.research` |
+| 技能名称与熟练度（进度条） | `SITE_CONFIG.skills.items` |
+| 学习经历 / 教育经历 | `SITE_CONFIG.research`、`SITE_CONFIG.education` |
 | 项目列表与 GitHub 仓库链接 | `SITE_CONFIG.projects` |
+| 比赛及获奖情况 | `SITE_CONFIG.awards` |
+| 我的笔记 | `SITE_CONFIG.notes` |
+| 银河目录版块与天体图标 | `SITE_CONFIG.nav.links` |
 | 照片墙图片 | `SITE_CONFIG.gallery` |
 | 主题、统计开关、ICP 备案号 | `SITE_CONFIG.defaultTheme`、`SITE_CONFIG.footer` |
 | 贪吃蛇速度 / 是否自动游动 | `SITE_CONFIG.snake` |
