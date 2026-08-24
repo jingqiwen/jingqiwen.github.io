@@ -5,7 +5,7 @@
  *  1. 你只需要修改本文件里的“占位符文字”和“占位链接”，
  *     全站内容都会自动更新。
  *  2. 所有需要你修改的地方都用中文注释标注了 【必改】或【可选】。
- *  3. 未填写的内容统一用“（这个人很懒，暂未拓展代码）”代替。
+ *  3. 未填写的内容统一用“（温景淇还没有写这部分）”代替。
  * =====================================================================
  */
 const SITE_CONFIG = {
@@ -97,24 +97,39 @@ const SITE_CONFIG = {
     subtitle: "自动模式AI自动操纵，切换成手动模式即可游玩",
     tip: "可切换成手动游玩",
 
-    autoPlay: true,          // 打开网页后 AI 自动游玩
-    initialSpeed: 210,       // 起步速度（毫秒/步）：故意调慢一点，吃 51 芯片会加速
+    autoPlay: true,          // 打开网页后 AI 自动游玩；点击按钮/方向键才切手动
+    initialSpeed: 220,       // 起步速度适中（毫秒/步），吃 51 芯片每次只快一点点
     gridSize: 17,
 
     // 蛇身编号：每死一次 +1，显示为“温景淇001号 / 温景淇002号 ……”
     serialName: "温景淇",
 
-    // Steam 风格的死亡成就：死亡次数达到 times 时自动弹出
+    // 每死一次都会弹一个“四字成语”成就，励志小字附在下面；列表循环使用
     achievements: [
-      { times: 1,   name: "初次报废",   quote: "失败乃成功之母，一次失败不代表什么。" },
-      { times: 2,   name: "再接再厉",   quote: "第二次倒下也没关系，站起来继续写代码。" },
-      { times: 3,   name: "三连击",     quote: "事不过三，但失败可以再来三次。" },
-      { times: 4,   name: "越挫越勇",   quote: "每一次短路，都是为下一次通电蓄力。" },
-      { times: 5,   name: "百炼成钢",   quote: "五次报废，恭喜你比昨天更懂调试。" },
-      { times: 8,   name: "电路老手",   quote: "八次失败，你已经把坑踩成了路。" },
-      { times: 10,  name: "十全十美",   quote: "十次重启，系统已经记住你的倔强。" },
-      { times: 100, name: "不死传说",   quote: "一百次报废之后，你就是这条蛇本身。" }
-    ]
+      { name: "百折不挠", quote: "学习如登山，跌倒了就再爬一次，山顶的风景值得。" },
+      { name: "愈挫愈勇", quote: "失败只是提醒你：下一次离成功更近了。" },
+      { name: "锲而不舍", quote: "锲而舍之，朽木不折；锲而不舍，金石可镂。" },
+      { name: "屡败屡战", quote: "真正的强者，不是没有失败，而是失败后依然出发。" },
+      { name: "迎难而上", quote: "困难像弹簧，你强它就弱。" },
+      { name: "持之以恒", quote: "最慢的步伐不是跬步，而是徘徊。" },
+      { name: "坚忍不拔", quote: "千磨万击还坚劲，任尔东西南北风。" },
+      { name: "砥砺前行", quote: "把每一次报错，都当成通往精通的阶梯。" },
+      { name: "再接再厉", quote: "今天的努力，是明天做项目的底气。" },
+      { name: "永不言弃", quote: "学不会就再学一遍，直到代码为你亮灯。" },
+      { name: "破而后立", quote: "电路板烧了可以重焊，信心不能烧。" },
+      { name: "行稳致远", quote: "沉下心来，慢慢走，反而走得更远。" }
+    ],
+
+    // 蛇长度达到 15 时的通关提示与专属成就
+    passLength: 15,
+    passMessage: "你对于专业的掌握已经小有成就，现在去做一个项目吧！",
+    passAchievement: {
+      name: "学海无涯",
+      quote: "学宜学，深益深。    ——温景淇"
+    },
+
+    // 智慧之星提示
+    starHint: "点亮：条件死亡一次，并通关一次后智慧之星将会被点亮"
   },
 
   /* ------------------------------------------------------------------
@@ -199,10 +214,10 @@ const SITE_CONFIG = {
 
     items: [
       {
-        time: "（这个人很懒，暂未拓展代码）",
-        name: "（这个人很懒，暂未拓展代码）",
-        role: "（这个人很懒，暂未拓展代码）",
-        desc: "（这个人很懒，暂未拓展代码）",
+        time: "（温景淇还没有写这部分）",
+        name: "（温景淇还没有写这部分）",
+        role: "（温景淇还没有写这部分）",
+        desc: "（温景淇还没有写这部分）",
         tags: ["待拓展"]
       }
     ]
@@ -219,9 +234,9 @@ const SITE_CONFIG = {
 
     items: [
       {
-        title: "（这个人很懒，暂未拓展代码）",
+        title: "（温景淇还没有写这部分）",
         category: "嵌入式",
-        summary: "（这个人很懒，暂未拓展代码）",
+        summary: "（温景淇还没有写这部分）",
         cover: "assets/project-cover.svg",
         tags: ["待拓展"],
         github: "#",
@@ -239,10 +254,10 @@ const SITE_CONFIG = {
 
     items: [
       {
-        time: "（这个人很懒，暂未拓展代码）",
-        name: "（这个人很懒，暂未拓展代码）",
-        level: "（这个人很懒，暂未拓展代码）",
-        desc: "（这个人很懒，暂未拓展代码）",
+        time: "（温景淇还没有写这部分）",
+        name: "（温景淇还没有写这部分）",
+        level: "（温景淇还没有写这部分）",
+        desc: "（温景淇还没有写这部分）",
         tags: ["待拓展"]
       }
     ]
@@ -257,10 +272,10 @@ const SITE_CONFIG = {
 
     items: [
       {
-        date: "（这个人很懒，暂未拓展代码）",
-        title: "（这个人很懒，暂未拓展代码）",
+        date: "（温景淇还没有写这部分）",
+        title: "（温景淇还没有写这部分）",
         category: "待拓展",
-        summary: "（这个人很懒，暂未拓展代码）",
+        summary: "（温景淇还没有写这部分）",
         link: "#"
       }
     ]
@@ -274,9 +289,9 @@ const SITE_CONFIG = {
     subtitle: "学习之外的生活记录 · 点击照片可放大查看",
 
     photos: [
-      { src: "assets/photo-1.svg", title: "（这个人很懒，暂未拓展代码）", desc: "（这个人很懒，暂未拓展代码）", date: "待拓展" },
-      { src: "assets/photo-2.svg", title: "（这个人很懒，暂未拓展代码）", desc: "（这个人很懒，暂未拓展代码）", date: "待拓展" },
-      { src: "assets/photo-3.svg", title: "（这个人很懒，暂未拓展代码）", desc: "（这个人很懒，暂未拓展代码）", date: "待拓展" }
+      { src: "assets/photo-1.svg", title: "（温景淇还没有写这部分）", desc: "（温景淇还没有写这部分）", date: "待拓展" },
+      { src: "assets/photo-2.svg", title: "（温景淇还没有写这部分）", desc: "（温景淇还没有写这部分）", date: "待拓展" },
+      { src: "assets/photo-3.svg", title: "（温景淇还没有写这部分）", desc: "（温景淇还没有写这部分）", date: "待拓展" }
     ]
   },
 
@@ -290,8 +305,8 @@ const SITE_CONFIG = {
     cards: [
       { type: "github", label: "GitHub", value: "jingqiwen", url: "https://github.com/jingqiwen", action: "link" },
       { type: "email", label: "邮箱", value: "2175414607@qq.com", url: "", action: "copy" },
-      { type: "qq", label: "QQ", value: "（这个人很懒，暂未拓展代码）", url: "", action: "copy" },
-      { type: "bilibili", label: "哔哩哔哩", value: "（这个人很懒，暂未拓展代码）", url: "https://space.bilibili.com/你的UID", action: "link" }
+      { type: "qq", label: "QQ", value: "（温景淇还没有写这部分）", url: "", action: "copy" },
+      { type: "bilibili", label: "哔哩哔哩", value: "（温景淇还没有写这部分）", url: "https://space.bilibili.com/你的UID", action: "link" }
     ]
   },
 
@@ -300,7 +315,7 @@ const SITE_CONFIG = {
    * ------------------------------------------------------------------ */
   footer: {
     copyright: "温景淇",
-    icp: "（这个人很懒，暂未拓展代码）",
+    icp: "（温景淇还没有写这部分）",
     statsEnabled: true
   }
 };

@@ -2641,6 +2641,184 @@ body.earth-cursor-active * {
 }
 
 /* ---------------------------------------------------------------------
+ * 十五点五、蓝色游戏机外观（摔坏一个角，露出绿色 PCB）+ 智慧之星
+ * --------------------------------------------------------------------- */
+/* 恢复为原来的天蓝外壳，整体清爽 */
+.snake-console {
+  background:
+    radial-gradient(130% 90% at 18% 0%, rgba(255, 255, 255, 0.75), transparent 52%),
+    linear-gradient(160deg, #eaf9ff 0%, #c8edff 55%, #9fd9ff 100%);
+  border: 1px solid rgba(41, 182, 246, 0.38);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.65),
+    inset 0 -14px 30px rgba(41, 143, 202, 0.12),
+    0 10px 30px rgba(30, 110, 165, 0.22);
+}
+
+.snake-console::before {
+  display: none; /* 去掉原来的网格点，看起来更干净 */
+}
+
+/* 完整外壳层：右上角切掉一个三角形（摔坏的角） */
+.console-shell-main {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: 22px;
+  background: linear-gradient(160deg, rgba(240, 251, 255, 0.94), rgba(176, 224, 255, 0.90));
+  clip-path: polygon(0 0, calc(100% - 38px) 0, 100% 38px, 100% 100%, 0 100%);
+  pointer-events: none;
+}
+
+:root[data-theme="dark"] .console-shell-main {
+  background: linear-gradient(160deg, rgba(28, 54, 82, 0.92), rgba(15, 37, 62, 0.92));
+}
+
+/* 缺角处露出的绿色集成电路板 */
+.console-broken-pcb {
+  position: absolute;
+  z-index: 0;
+  right: -8px;
+  top: -8px;
+  width: 92px;
+  height: 92px;
+  border-radius: 0 22px 0 0;
+  background:
+    repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.06) 0 2px, transparent 2px 7px),
+    linear-gradient(145deg, #087a3d, #065c2d 60%, #0b8b45);
+  border: 1px solid rgba(122, 255, 178, 0.35);
+  clip-path: polygon(100% 0, 0 0, 100% 100%);
+  box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.35);
+}
+
+/* 破口处的小芯片与元件 */
+.console-break-chip {
+  position: absolute;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(145deg, #333b46, #0e131a);
+  border: 1px solid rgba(150, 200, 220, 0.35);
+  border-radius: 5px;
+  color: #c8ffe4;
+  font-size: 0.52rem;
+  font-weight: 800;
+  box-shadow: 0 3px 7px rgba(0, 0, 0, 0.4);
+}
+
+.break-chip-1 { right: 30px; top: 2px; width: 44px; height: 22px; transform: rotate(-8deg); }
+.break-chip-2 { right: 2px; top: 28px; width: 34px; height: 20px; transform: rotate(10deg); }
+
+.console-break-resistor {
+  position: absolute;
+  z-index: 2;
+  right: 14px;
+  top: 4px;
+  width: 16px;
+  height: 6px;
+  border-radius: 3px;
+  background: repeating-linear-gradient(90deg, #f4a261 0 3px, #b5682a 3px 5px);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
+}
+
+/* 螺丝与指示灯调整位置，避开破口 */
+.console-screw.screw-2 { right: 52px; top: 10px; }
+.console-led { right: 46px; top: 13px; }
+
+/* 标题与文字恢复为随主题的颜色（右侧留出摔坏的角） */
+.snake-head { color: var(--text); padding-right: 44px; }
+.snake-title { color: var(--text); font-size: 0.84rem; }
+.snake-score { box-shadow: 0 4px 14px rgba(41, 182, 246, 0.40); }
+
+/* 状态栏改成浅蓝玻璃，干净不杂乱 */
+.snake-statusbar {
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(41, 182, 246, 0.22);
+  color: var(--text-secondary);
+}
+
+:root[data-theme="dark"] .snake-statusbar {
+  background: rgba(12, 28, 48, 0.58);
+  color: #bfffe2;
+}
+
+.status-serial { background: rgba(41, 182, 246, 0.12); border-color: rgba(41, 182, 246, 0.35); color: var(--primary-strong); }
+:root[data-theme="dark"] .status-serial { color: #6dffc0; }
+
+/* 智慧之星与提示 */
+.wisdom-zone {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 2px 0 10px;
+  padding: 6px 10px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.42);
+  border: 1px dashed rgba(41, 182, 246, 0.35);
+}
+
+:root[data-theme="dark"] .wisdom-zone {
+  background: rgba(12, 28, 48, 0.45);
+}
+
+.wisdom-star {
+  flex: 0 0 auto;
+  font-size: 24px;
+  line-height: 1;
+  color: rgba(150, 170, 190, 0.55);
+  text-shadow: none;
+  transition: color 0.5s, text-shadow 0.5s, transform 0.5s;
+}
+
+.wisdom-star.lit {
+  color: #ffd75e;
+  text-shadow: 0 0 12px rgba(255, 215, 94, 0.95), 0 0 26px rgba(255, 190, 60, 0.55);
+  animation: wisdom-twinkle 1.8s ease-in-out infinite;
+}
+
+@keyframes wisdom-twinkle {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50%      { transform: scale(1.15); opacity: 0.85; }
+}
+
+.wisdom-hint {
+  font-size: 0.68rem;
+  line-height: 1.35;
+  color: var(--text-secondary);
+}
+
+/* 智慧之星点亮后：游戏机亮度提升 30% */
+.snake-card.wisdom-lit .snake-console {
+  filter: brightness(1.30);
+}
+
+/* 控制按钮恢复为天蓝浅色（不再是深色 PCB 按钮） */
+.snake-console .dpad button,
+.snake-console .mini-btn {
+  background: linear-gradient(145deg, #ffffff, #dceffb);
+  border-color: rgba(41, 182, 246, 0.30);
+  color: var(--text-secondary);
+}
+
+:root[data-theme="dark"] .snake-console .dpad button,
+:root[data-theme="dark"] .snake-console .mini-btn {
+  background: linear-gradient(145deg, #20354e, #12243a);
+  border-color: rgba(127, 216, 255, 0.22);
+  color: #d7ecff;
+}
+
+.snake-console .dpad button:hover,
+.snake-console .mini-btn:hover {
+  color: var(--primary-strong);
+  border-color: var(--border-strong);
+}
+
+.snake-console .dpad .center { background: var(--gradient); color: #fff; }
+
+/* ---------------------------------------------------------------------
  * 十六、无障碍：用户系统开启“减少动态效果”时关闭动画
  * --------------------------------------------------------------------- */
 @media (prefers-reduced-motion: reduce) {

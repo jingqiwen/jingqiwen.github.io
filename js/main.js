@@ -408,21 +408,21 @@
    *    电阻、电感、烧坏的电路板（危险，吃到立即死亡）；
    *  - 蛇身编号“温景淇001号”，每死一次 +1；
    *  - 死亡后播放爆炸动画，5 秒后自动重启；
-   *  - 死亡 1/2/3/4/5/8/10/100 次会弹出 Steam 风格成就。
+   *  - 每死一次都弹出一个四字成语成就；长度达到 15 时通关并点亮智慧之星。
    * ================================================================== */
   let snake = null; // 贪吃蛇实例，供全局键盘事件使用
 
   // 食物皮肤与权重配置：权重越大出现概率越高
   const FOOD_DEFS = {
-    code:       { weight: 32, label: "代码",   color: "#7fe0ff", glyph: "</>" },
+    code:       { weight: 32, label: "代码",   color: "#7fe0ff", glyph: "💻" },
     chip51:     { weight: 12, label: "51芯片", color: "#3ddc84", glyph: "51" },
     chip32:     { weight: 10, label: "32芯片", color: "#4fc3f7", glyph: "32" },
     book:       { weight: 10, label: "书本",   color: "#ffd166", glyph: "📘" },
-    resistor:   { weight: 9,  label: "电阻",   color: "#f4a261", glyph: "R" },
+    resistor:   { weight: 9,  label: "电阻",   color: "#f4a261", glyph: "Ω" },
     data:       { weight: 8,  label: "数据流", color: "#9b8cff", glyph: "≋" },
-    capacitor:  { weight: 8,  label: "电容",   color: "#ff8fab", glyph: "C" },
-    inductor:   { weight: 6,  label: "电感",   color: "#b8f25a", glyph: "L" },
-    burnt:      { weight: 5,  label: "烧坏电路板", color: "#ff4d4d", glyph: "☠" }
+    capacitor:  { weight: 8,  label: "电容",   color: "#ff8fab", glyph: "⚡" },
+    inductor:   { weight: 6,  label: "电感",   color: "#b8f25a", glyph: "🧲" },
+    burnt:      { weight: 5,  label: "烧坏电路板", color: "#ff4d4d", glyph: "🔥" }
   };
 
   // 成就提示：名字 + 励志语录
@@ -442,7 +442,7 @@
     setTimeout(() => {
       pop.classList.remove("show");
       setTimeout(() => pop.parentNode && pop.parentNode.removeChild(pop), 350);
-    }, 4200);
+    }, 10000); // 成就停留 10 秒
   }
 
   function renderSnakeCard() {
@@ -450,37 +450,35 @@
     const right = $("hero-right");
     if (!right) return;
 
-    // 游戏机外壳只搭一部分：绿色 PCB 露出、芯片/排线/螺丝可见
+    // 蓝色游戏机外壳：右上角摔掉一个角，露出里面的绿色 PCB 和元件
     right.innerHTML =
       '<div class="snake-card glass-card reveal">' +
       '  <div class="snake-console">' +
-      '    <div class="console-pcb pcb-a"></div>' +
-      '    <div class="console-pcb pcb-b"></div>' +
-      '    <div class="console-shell shell-left"></div>' +
-      '    <div class="console-shell shell-right"></div>' +
-      '    <div class="console-chip console-chip-1"><span>STM32</span></div>' +
-      '    <div class="console-chip console-chip-2"><span>AT89C51</span></div>' +
-      '    <div class="console-chip console-chip-3"><span>PY</span></div>' +
+      '    <div class="console-broken-pcb"></div>' +
+      '    <div class="console-shell-main"></div>' +
+      '    <div class="console-break-chip break-chip-1"><span>STM32</span></div>' +
+      '    <div class="console-break-chip break-chip-2"><span>51</span></div>' +
+      '    <div class="console-break-resistor"></div>' +
       '    <div class="console-screw screw-1"></div>' +
       '    <div class="console-screw screw-2"></div>' +
       '    <div class="console-screw screw-3"></div>' +
-      '    <div class="console-screw screw-4"></div>' +
-      '    <div class="console-ribbon"></div>' +
       '    <div class="console-led"></div>' +
-      '    <div class="console-label">WJQ-SNAKE · PCB-001</div>' +
       '    <div class="snake-head">' +
       '      <span class="snake-title">🐍 ' + escapeHtml(config.title || "贪吃蛇") + "</span>" +
       '      <span class="snake-score" id="snake-score">长度 4</span>' +
       "    </div>" +
-      '    <p class="snake-subtitle">' + escapeHtml(config.subtitle || "") + "</p>" +
+      '    <div class="wisdom-zone">' +
+      '      <div class="wisdom-star" id="wisdom-star" title="智慧之星">★</div>' +
+      '      <div class="wisdom-hint" id="wisdom-hint">' + escapeHtml(config.starHint || "点亮：条件死亡一次，并通关一次后智慧之星将会被点亮") + "</div>" +
+      "    </div>" +
       '    <div class="console-screen">' +
       '      <div class="screen-vent vent-1"></div><div class="screen-vent vent-2"></div>' +
       '      <div class="snake-canvas-wrap" id="snake-wrap"><canvas id="snake-canvas" aria-label="贪吃蛇小游戏画布"></canvas></div>' +
       "    </div>" +
       '    <div class="snake-statusbar">' +
       '      <span class="status-serial" id="snake-serial">' + escapeHtml((config.serialName || "温景淇") + "001号") + "</span>" +
-      '      <span class="status-item" id="snake-shield">🛡 护盾 --</span>' +
-      '      <span class="status-item" id="snake-energy">⚡ 电容未储能</span>' +
+      '      <span class="status-item" id="snake-shield">🛡 --</span>' +
+      '      <span class="status-item" id="snake-energy">⚡ 未储能</span>' +
       '      <span class="status-item" id="snake-effect">状态正常</span>' +
       "    </div>" +
       '    <div class="snake-controls">' +
@@ -492,18 +490,10 @@
       '        <button type="button" class="down" data-dir="down" aria-label="向下">▼</button>' +
       "      </div>" +
       '      <div class="snake-actions">' +
-      '        <div class="snake-auto-wrap">' +
-      '          <button type="button" class="mini-btn active" id="snake-auto">自动游动</button>' +
-      '          <span class="auto-hint">' + escapeHtml(config.tip || "可切换成手动游玩") + "</span>" +
-      "        </div>" +
+      '        <button type="button" class="mini-btn active" id="snake-auto">自动游动</button>' +
       '        <button type="button" class="mini-btn cap-btn" id="snake-capacitor" disabled>⚡ 释放电容</button>' +
       '        <button type="button" class="mini-btn" id="snake-reset">重新开始</button>' +
       "      </div>" +
-      "    </div>" +
-      '    <div class="snake-legend">' +
-      '      <span>51=加速</span><span>32=+2长度</span><span>书本=+1</span><span>代码=+1</span>' +
-      '      <span>数据流=10s护盾</span><span>电容=储能爆发</span><span>电阻=减速</span>' +
-      '      <span>电感=电磁反弹</span><span class="danger">烧毁板=死亡</span>' +
       "    </div>" +
       "  </div>" +
       "</div>";
@@ -520,6 +510,9 @@
       resetBtn: $("snake-reset"),
       pauseBtn: $("snake-pause"),
       capacitorBtn: $("snake-capacitor"),
+      starEl: $("wisdom-star"),
+      hintEl: $("wisdom-hint"),
+      cardEl: $("hero-right") ? $("hero-right").querySelector(".snake-card") : null,
       config: config
     });
     snake.init();
@@ -537,12 +530,15 @@
     this.resetBtn = options.resetBtn;
     this.pauseBtn = options.pauseBtn;
     this.capacitorBtn = options.capacitorBtn;
+    this.starEl = options.starEl;
+    this.hintEl = options.hintEl;
+    this.cardEl = options.cardEl;
     this.config = options.config || {};
 
     this.gridSize = this.config.gridSize || 17;
-    this.initialSpeed = this.config.initialSpeed || 210; // 起步故意慢一点
-    this.minSpeed = 78;   // 最快速度（吃 51 芯片逐渐逼近）
-    this.maxSpeed = 300;  // 最慢速度（吃电阻后）
+    this.initialSpeed = this.config.initialSpeed || 210; // 起步速度适中
+    this.minSpeed = 150;  // 最快速度：只比初始快一点点，不再起飞
+    this.maxSpeed = 260;  // 最慢速度
     this.speed = this.initialSpeed;
     this.serialName = this.config.serialName || "温景淇";
     this.autoPlay = this.config.autoPlay !== false;
@@ -571,9 +567,10 @@
     this.effectText = "状态正常";
     this.effectUntil = 0;
 
-    // 死亡 / 编号 / 成就
+    // 死亡 / 编号 / 成就 / 通关 / 智慧之星
     this.serial = 1;               // 温景淇001号
     this.deathCount = 0;
+    this.hasPassed = false;        // 长度是否达到 15（通关一次）
     this.deathReason = "";
     this.deathRestartAt = 0;
     this.deathTimer = 0;
@@ -581,6 +578,14 @@
     this.deathParticles = [];
     this.deathParticleRaf = 0;
     this.achievements = this.config.achievements || [];
+
+    // 智慧之星：死亡一次 + 通关一次后点亮；点亮后游戏机亮度 +30%
+    this.wisdomLit = false;
+    try {
+      this.wisdomLit = localStorage.getItem("wjq-wisdom-star") === "1";
+    } catch (error) {
+      // 隐私模式无法读取本地存储时忽略
+    }
 
     this.ctx = null;
     this.cell = 0;
@@ -600,6 +605,7 @@
     this.resetGame();
     this.draw();
     this.updateStatusBar();
+    this.updateWisdomStar();
 
     // 系统减少动态效果时：不自动游动，只做静态展示
     if (this.reduceMotion) {
@@ -704,7 +710,8 @@
 
   SnakeGame.prototype.resizeCanvas = function () {
     const size = this.wrap.clientWidth || 320;
-    this.dpr = Math.min(window.devicePixelRatio || 1, 2);
+    // 为流畅度优先：贪吃蛇画布固定 1 倍像素，避免高分屏渲染过重
+    this.dpr = 1;
     this.canvas.width = size * this.dpr;
     this.canvas.height = size * this.dpr;
     this.cell = this.canvas.width / this.gridSize;
@@ -766,6 +773,32 @@
 
   SnakeGame.prototype.updateScore = function () {
     if (this.scoreEl) this.scoreEl.textContent = "长度 " + this.score;
+  };
+
+  // 智慧之星：死亡一次 + 通关一次后点亮；点亮后游戏机亮度提升 30%
+  SnakeGame.prototype.updateWisdomStar = function () {
+    const shouldLit = !!(this.deathCount >= 1 && this.hasPassed);
+    if (shouldLit && !this.wisdomLit) {
+      this.wisdomLit = true;
+      try {
+        localStorage.setItem("wjq-wisdom-star", "1");
+      } catch (error) {
+        // 忽略存储失败
+      }
+    }
+
+    if (this.starEl) {
+      this.starEl.classList.toggle("lit", this.wisdomLit);
+      this.starEl.textContent = this.wisdomLit ? "★" : "☆";
+    }
+    if (this.hintEl) {
+      this.hintEl.textContent = this.wisdomLit
+        ? "智慧之星已点亮：界面亮度提升 30%"
+        : (this.config.starHint || "点亮：条件死亡一次，并通关一次后智慧之星将会被点亮");
+    }
+    if (this.cardEl) {
+      this.cardEl.classList.toggle("wisdom-lit", this.wisdomLit);
+    }
   };
 
   SnakeGame.prototype.updateModeUI = function () {
@@ -867,12 +900,12 @@
         this.setEffect("32芯片：蛇身长度 +2", 1800);
         break;
       case "chip51":
-        this.speed = Math.max(this.minSpeed, this.speed - 18);
-        this.setEffect("51芯片：移动速度提升！", 2200);
+        this.speed = Math.max(this.minSpeed, this.speed - 8);
+        this.setEffect("51芯片：移动速度提升一点", 2200);
         this.startLoop();
         break;
       case "resistor":
-        this.speed = Math.min(this.maxSpeed, this.speed + 26);
+        this.speed = Math.min(this.maxSpeed, this.speed + 14);
         this.setEffect("电阻：移动速度减慢了…", 2200);
         this.startLoop();
         break;
@@ -911,7 +944,7 @@
     const self = this;
     this.capacitorReady = false;
     this.preBoostSpeed = this.speed;
-    this.speed = Math.max(58, this.minSpeed - 12);
+    this.speed = 105; // 爆发速度明显快，但不会快到失控
     this.boostUntil = Date.now() + 3000;
     this.setEffect("⚡ 电容爆发：超强速度 + 3 秒无敌！", 3000);
     this.boostTimer = setTimeout(() => {
@@ -958,10 +991,15 @@
 
     if (this.serialEl) this.serialEl.textContent = this.serialText();
 
-    // Steam 风格成就
-    (this.achievements || []).forEach((ach) => {
-      if (ach.times === this.deathCount) pushAchievement(ach.name, ach.quote);
-    });
+    // 每死一次都弹一个四字成语成就（列表循环使用）
+    const deathAchievements = this.achievements || [];
+    if (deathAchievements.length) {
+      const ach = deathAchievements[(this.deathCount - 1) % deathAchievements.length];
+      pushAchievement(ach.name, ach.quote);
+    }
+
+    // 检查智慧之星是否满足点亮条件（死亡一次 + 之后通关一次）
+    this.updateWisdomStar();
 
     showToast("💥 " + reason + "，" + this.serialText() + " 已报废");
 
@@ -1097,6 +1135,19 @@
 
     this.score = this.snakeBody.length;
     this.updateScore();
+
+    // 通关判定：长度达到配置值（默认 15）时提示通关并解锁“学海无涯”成就
+    const passLength = Number(this.config.passLength || 15);
+    if (!this.hasPassed && this.score >= passLength) {
+      this.hasPassed = true;
+      const passAchievement = this.config.passAchievement || {};
+      // 通关提示里附带当前时间，方便记录“这一刻”
+      const passTime = new Date().toLocaleTimeString("zh-CN", { hour12: false });
+      showToast("🏅 " + passTime + " · " + (this.config.passMessage || "恭喜通关！"));
+      pushAchievement(passAchievement.name || "学海无涯", passAchievement.quote || "学宜学，深益深。    ——温景淇");
+      this.updateWisdomStar();
+    }
+
     this.draw();
   };
 
@@ -1141,21 +1192,23 @@
     // 2. 食物皮肤
     this.drawFood(ctx, cell);
 
-    // 3. 科技蛇：绿色 PCB 蛇身 + 发光电路走线
-    for (let i = this.snakeBody.length - 1; i >= 0; i--) {
+    // 3. 机器蛇：蓝青金属分段，蛇身随长度逐渐变色（青 → 蓝紫渐变）
+    const bodyLen = this.snakeBody.length;
+    const hueStart = 190 + Math.min(1, bodyLen / 15) * 70;
+    for (let i = bodyLen - 1; i >= 0; i--) {
       const seg = this.snakeBody[i];
       const x = seg.x * cell;
       const y = seg.y * cell;
-      const pad = Math.max(1.5, cell * 0.08);
-      const radius = cell * 0.22;
+      const pad = Math.max(1.5, cell * 0.10);
+      const radius = cell * 0.18;
       const head = i === 0;
+      const ratio = 1 - i / Math.max(1, bodyLen - 1);
+      const hue = Math.round(hueStart - ratio * 45);
 
-      ctx.save();
-      ctx.shadowColor = head ? "#2ee6a8" : "#0f7a5a";
-      ctx.shadowBlur = head ? cell * 0.55 : cell * 0.22;
-      ctx.fillStyle = head ? "#0d5c40" : "#0b3d2b";
-      ctx.strokeStyle = head ? "#3dffb0" : "#2ee6a8";
-      ctx.lineWidth = Math.max(1, cell * 0.06);
+      // 不启用 shadowBlur：这是保持流畅的关键（每帧少几十次模糊运算）
+      ctx.fillStyle = "hsl(" + hue + ", 78%, " + (head ? 56 : 45) + "%)";
+      ctx.strokeStyle = "hsl(" + hue + ", 92%, 72%)";
+      ctx.lineWidth = Math.max(1, cell * 0.07);
       ctx.beginPath();
       if (typeof ctx.roundRect === "function") {
         ctx.roundRect(x + pad, y + pad, cell - pad * 2, cell - pad * 2, radius);
@@ -1164,28 +1217,22 @@
       }
       ctx.fill();
       ctx.stroke();
-      ctx.restore();
 
-      // PCB 走线：每节画一条横线 + 两个焊点
-      ctx.save();
-      ctx.globalAlpha = 0.55;
-      ctx.strokeStyle = head ? "#7dffd2" : "#2ee6a8";
-      ctx.lineWidth = Math.max(1, cell * 0.05);
+      // 机器关节线：轻量一根中线即可
+      ctx.strokeStyle = "rgba(255,255,255,0.35)";
+      ctx.lineWidth = Math.max(1, cell * 0.04);
+      ctx.beginPath();
       const cy = y + cell / 2;
-      ctx.beginPath(); ctx.moveTo(x + cell * 0.2, cy); ctx.lineTo(x + cell * 0.8, cy); ctx.stroke();
-      ctx.fillStyle = "#ffd166";
-      ctx.beginPath(); ctx.arc(x + cell * 0.24, cy, Math.max(1, cell * 0.06), 0, Math.PI * 2); ctx.fill();
-      ctx.beginPath(); ctx.arc(x + cell * 0.76, cy, Math.max(1, cell * 0.06), 0, Math.PI * 2); ctx.fill();
-      ctx.restore();
+      ctx.moveTo(x + cell * 0.25, cy);
+      ctx.lineTo(x + cell * 0.75, cy);
+      ctx.stroke();
 
       if (head) {
-        // 科技蛇头部：LED 眼睛 + 额头编号
+        // 机器蛇头部：蓝色面罩 + LED 眼睛
         const cx = x + cell / 2;
-        const eyeR = Math.max(1.6, cell * 0.09);
-        const eyeOff = cell * 0.2;
-        ctx.fillStyle = "#9fffe0";
-        ctx.shadowColor = "#3dffb0";
-        ctx.shadowBlur = cell * 0.4;
+        const eyeR = Math.max(2, cell * 0.12);
+        const eyeOff = cell * 0.22;
+        ctx.fillStyle = "#eaffff";
         const eyePositions = {
           up: [[cx - eyeOff, cy - eyeOff], [cx + eyeOff, cy - eyeOff]],
           down: [[cx - eyeOff, cy + eyeOff], [cx + eyeOff, cy + eyeOff]],
@@ -1194,31 +1241,25 @@
         }[this.dir] || [[cx - eyeOff, cy], [cx + eyeOff, cy]];
         ctx.beginPath(); ctx.arc(eyePositions[0][0], eyePositions[0][1], eyeR, 0, Math.PI * 2); ctx.fill();
         ctx.beginPath(); ctx.arc(eyePositions[1][0], eyePositions[1][1], eyeR, 0, Math.PI * 2); ctx.fill();
-        ctx.shadowBlur = 0;
 
-        // 蛇身编号：写在头部附近
-        ctx.font = "700 " + Math.round(cell * 0.30) + "px sans-serif";
+        // 蛇身编号：加粗加大，保证看得清
+        ctx.font = "900 " + Math.round(cell * 0.5) + "px sans-serif";
         ctx.textAlign = "center";
         ctx.textBaseline = "bottom";
-        ctx.fillStyle = "#a8ffe0";
-        ctx.shadowColor = "rgba(0,0,0,0.8)";
-        ctx.shadowBlur = 3;
-        const labelY = seg.y > 0 ? y - cell * 0.12 : y + cell * 1.1;
+        ctx.fillStyle = "#ffffff";
+        const labelY = seg.y > 0 ? y - cell * 0.12 : y + cell * 1.15;
         ctx.fillText(this.serialText(), cx, labelY);
-        ctx.shadowBlur = 0;
       }
     }
 
-    // 4. 护盾 / 电容爆发光环
+    // 4. 护盾 / 电容爆发光环（轻量描边，不做模糊）
     if (this.isInvincible() && this.snakeBody.length) {
       const hx = this.snakeBody[0].x * cell + cell / 2;
       const hy = this.snakeBody[0].y * cell + cell / 2;
       ctx.save();
-      ctx.strokeStyle = "rgba(127, 224, 255, 0.85)";
+      ctx.strokeStyle = "rgba(127, 224, 255, 0.9)";
       ctx.lineWidth = Math.max(1.5, cell * 0.08);
-      ctx.shadowColor = "#7fe0ff";
-      ctx.shadowBlur = cell * 0.7;
-      ctx.globalAlpha = 0.65 + 0.25 * Math.sin(Date.now() / 180);
+      ctx.globalAlpha = 0.6 + 0.3 * Math.sin(Date.now() / 180);
       ctx.beginPath();
       ctx.arc(hx, hy, cell * 0.85, 0, Math.PI * 2);
       ctx.stroke();
@@ -1258,60 +1299,47 @@
     }
   };
 
-  // 绘制各种元件食物皮肤
+  // 绘制元件食物皮肤：统一为圆角“元件卡”，清爽不发灰
   SnakeGame.prototype.drawFood = function (ctx, cell) {
     const def = FOOD_DEFS[this.food.type] || FOOD_DEFS.code;
     const x = this.food.x * cell;
     const y = this.food.y * cell;
-    const pad = cell * 0.10;
+    const pad = cell * 0.09;
     const w = cell - pad * 2;
     const cx = x + cell / 2;
     const cy = y + cell / 2;
+    const burnt = this.food.type === "burnt";
 
     ctx.save();
+    ctx.globalAlpha = burnt ? 0.75 + 0.25 * Math.sin(Date.now() / 150) : 0.92;
 
-    // 烧坏的电路板：红色危险提示 + 闪烁
-    if (this.food.type === "burnt") {
-      const blink = 0.7 + 0.3 * Math.sin(Date.now() / 140);
-      ctx.shadowColor = "#ff4d4d";
-      ctx.shadowBlur = cell * 0.8;
-      ctx.globalAlpha = blink;
-      ctx.fillStyle = "#3a0d0d";
-      ctx.strokeStyle = "#ff4d4d";
-      ctx.lineWidth = Math.max(1.5, cell * 0.08);
-      ctx.beginPath();
-      if (typeof ctx.roundRect === "function") ctx.roundRect(x + pad, y + pad, w, w, cell * 0.18);
-      else ctx.rect(x + pad, y + pad, w, w);
-      ctx.fill(); ctx.stroke();
-    } else {
-      ctx.shadowColor = def.color;
-      ctx.shadowBlur = cell * 0.5;
-      ctx.fillStyle = "rgba(8, 20, 38, 0.92)";
-      ctx.strokeStyle = def.color;
-      ctx.lineWidth = Math.max(1.2, cell * 0.06);
-      ctx.beginPath();
-      if (typeof ctx.roundRect === "function") ctx.roundRect(x + pad, y + pad, w, w, cell * 0.18);
-      else ctx.rect(x + pad, y + pad, w, w);
-      ctx.fill(); ctx.stroke();
-    }
+    // 柔和底色 + 彩色描边（不加 shadowBlur，保证流畅）
+    ctx.fillStyle = burnt ? "#4a1010" : "rgba(10, 30, 52, 0.92)";
+    ctx.strokeStyle = def.color;
+    ctx.lineWidth = Math.max(1.2, cell * 0.07);
+    ctx.beginPath();
+    if (typeof ctx.roundRect === "function") ctx.roundRect(x + pad, y + pad, w, w, cell * 0.20);
+    else ctx.rect(x + pad, y + pad, w, w);
+    ctx.fill();
+    ctx.stroke();
 
-    // 元件符号 / 文字
-    ctx.shadowBlur = 0;
+    // 元件高光（左上角一小块白）
+    ctx.fillStyle = "rgba(255,255,255,0.20)";
+    ctx.beginPath();
+    if (typeof ctx.roundRect === "function") ctx.roundRect(x + pad + cell * 0.08, y + pad + cell * 0.08, w * 0.5, cell * 0.10, cell * 0.05);
+    else ctx.rect(x + pad + cell * 0.08, y + pad + cell * 0.08, w * 0.5, cell * 0.10);
+    ctx.fill();
+
+    // 中间图标 / 元件文字
+    ctx.fillStyle = burnt ? "#ffb3b3" : def.color;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.fillStyle = this.food.type === "burnt" ? "#ff8b8b" : def.color;
-    if (this.food.type === "book") {
-      ctx.font = Math.round(cell * 0.62) + "px serif";
+    if (this.food.type === "book" || this.food.type === "code" || this.food.type === "inductor") {
+      ctx.font = Math.round(cell * 0.52) + "px serif";
       ctx.fillText(def.glyph, cx, cy);
     } else {
-      ctx.font = "800 " + Math.round(cell * 0.44) + "px sans-serif";
+      ctx.font = "900 " + Math.round(cell * 0.42) + "px sans-serif";
       ctx.fillText(def.glyph, cx, cy + cell * 0.02);
-    }
-
-    // 烧坏板额外画个骷髅底纹提示
-    if (this.food.type === "burnt") {
-      ctx.font = Math.round(cell * 0.3) + "px sans-serif";
-      ctx.fillText("☠", cx, cy);
     }
 
     ctx.restore();

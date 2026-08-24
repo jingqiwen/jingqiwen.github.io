@@ -56,7 +56,7 @@
 
     // --- 1. 创建渲染器（开启透明，让 CSS 夜空渐变透出来） ---
     renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2)); // 最高 2 倍，防止手机过热
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5)); // 最高 1.5 倍，兼顾画质与流畅
     renderer.setClearColor(0x000000, 0); // 全透明背景
     container.appendChild(renderer.domElement);
 
@@ -84,6 +84,131 @@
       const texture = new THREE.CanvasTexture(canvas);
       texture.needsUpdate = true;
       return texture;
+    }
+
+    /* --- 3.5 月亮 / 行星 / 星座纹理与对象 --- */
+    function makeCelestialTexture(kind) {
+      const size = 160;
+      const canvas = document.createElement("canvas");
+      canvas.width = canvas.height = size;
+      const ctx = canvas.getContext("2d");
+      const cx = size / 2;
+      const cy = size / 2;
+
+      if (kind === "saturn") {
+        // 土星：本体 + 倾斜光环
+        const g = ctx.createRadialGradient(cx - 18, cy - 18, 8, cx, cy, 62);
+        g.addColorStop(0, "#fff3c4");
+        g.addColorStop(0.5, "#e8c878");
+        g.addColorStop(1, "#b98a3e");
+        ctx.fillStyle = g;
+        ctx.beginPath(); ctx.arc(cx, cy, 44, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = "rgba(230, 210, 150, 0.85)";
+        ctx.lineWidth = 9;
+        ctx.beginPath(); ctx.ellipse(cx, cy, 76, 26, -0.42, 0, Math.PI * 2); ctx.stroke();
+      } else if (kind === "jupiter") {
+        const g = ctx.createRadialGradient(cx - 15, cy - 15, 6, cx, cy, 62);
+        g.addColorStop(0, "#ffe2b8"); g.addColorStop(0.5, "#d99a62"); g.addColorStop(1, "#9c6238");
+        ctx.fillStyle = g;
+        ctx.beginPath(); ctx.arc(cx, cy, 52, 0, Math.PI * 2); ctx.fill();
+        ctx.save(); ctx.clip();
+        ctx.strokeStyle = "rgba(150, 78, 40, 0.45)";
+        ctx.lineWidth = 7;
+        for (let i = -2; i <= 2; i++) { ctx.beginPath(); ctx.moveTo(0, cy + i * 16); ctx.lineTo(size, cy + i * 16); ctx.stroke(); }
+        ctx.restore();
+      } else if (kind === "moon") {
+        const g = ctx.createRadialGradient(cx - 16, cy - 16, 6, cx, cy, 66);
+        g.addColorStop(0, "#ffffff"); g.addColorStop(0.55, "#dbe8f2"); g.addColorStop(1, "#9fb4c8");
+        ctx.fillStyle = g;
+        ctx.beginPath(); ctx.arc(cx, cy, 56, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = "rgba(130, 155, 180, 0.28)";
+        [[-16, -14], [12, 8], [18, -24], [-10, 20]].forEach((p) => {
+          ctx.beginPath(); ctx.arc(cx + p[0], cy + p[1], 8, 0, Math.PI * 2); ctx.fill();
+        });
+      } else {
+        const palette = {
+          mars: ["#ffb08a", "#c9432c"],
+          venus: ["#fff2c9", "#d9a94e"],
+          neptune: ["#8fd8ff", "#2863c9"]
+        };
+        const colors = palette[kind] || palette.neptune;
+        const g = ctx.createRadialGradient(cx - 14, cy - 14, 6, cx, cy, 54);
+        g.addColorStop(0, colors[0]); g.addColorStop(1, colors[1]);
+        ctx.fillStyle = g;
+        ctx.beginPath(); ctx.arc(cx, cy, 48, 0, Math.PI * 2); ctx.fill();
+        if (kind === "mars") {
+          ctx.fillStyle = "rgba(120, 40, 25, 0.22)";
+          [[-12, 10], [16, -6], [6, 20]].forEach((p) => {
+            ctx.beginPath(); ctx.arc(cx + p[0], cy + p[1], 9, 0, Math.PI * 2); ctx.fill();
+          });
+        }
+      }
+      const texture = new THREE.CanvasTexture(canvas);
+      texture.needsUpdate = true;
+      return texture;
+    }
+
+    function addCelestialSprite(kind, x, y, z, worldSize, opacity) {
+      const material = new THREE.SpriteMaterial({
+        map: makeCelestialTexture(kind),
+        transparent: true,
+        opacity: opacity,
+        depthWrite: false
+      });
+      const sprite = new THREE.Sprite(material);
+      sprite.position.set(x, y, z);
+      sprite.scale.set(worldSize, worldSize, 1);
+      group.add(sprite);
+    }
+
+    function addConstellation(points, x, y, z, scale) {
+      const pts = points.map((p) => new THREE.Vector3(p[0], p[1], 0));
+      const lineGeom = new THREE.BufferGeometry().setFromPoints(pts);
+      const lineMat = new THREE.LineBasicMaterial({ color: 0x9fd8ff, transparent: true, opacity: 0.42 });
+      const line = new THREE.Line(lineGeom, lineMat);
+      line.position.set(x, y, z);
+      line.scale.set(scale, scale, scale);
+      group.add(line);
+
+      // 星座顶点用更亮的大星点表示
+      const pointGeom = new THREE.BufferGeometry().setFromPoints(pts);
+      const pointMat = new THREE.PointsMaterial({
+        size: 6.5, map: makeStarTexture(), color: 0xffffff,
+        transparent: true, opacity: 0.9, depthWrite: false,
+        blending: THREE.AdditiveBlending, sizeAttenuation: true
+      });
+      const pointStars = new THREE.Points(pointGeom, pointMat);
+      pointStars.position.copy(line.position);
+      pointStars.scale.copy(line.scale);
+      group.add(pointStars);
+    }
+
+    function rebuildCelestial() {
+      const w = container.clientWidth || window.innerWidth;
+      const h = container.clientHeight || window.innerHeight;
+      const m = isMobile ? 0.7 : 1;
+
+      // 月亮 + 各大行星：比背景星星更大、更亮，会跟着整片星空一起随鼠标转动
+      addCelestialSprite("moon", -w * 0.32, -h * 0.26, -170, 120 * m, 0.98);
+      addCelestialSprite("mars", w * 0.34, h * 0.20, -140, 52 * m, 0.92);
+      addCelestialSprite("jupiter", w * 0.20, -h * 0.30, -120, 74 * m, 0.88);
+      addCelestialSprite("saturn", -w * 0.36, h * 0.28, -110, 110 * m, 0.92);
+      addCelestialSprite("venus", w * 0.42, -h * 0.10, -90, 44 * m, 0.90);
+      addCelestialSprite("neptune", -w * 0.16, h * 0.34, -150, 56 * m, 0.86);
+
+      // 星座连线：狮子座 / 猎户座 / 北斗七星
+      addConstellation(
+        [[-36, -14], [-12, 4], [18, -2], [34, 12], [10, 26], [-8, 8]],
+        w * 0.28, h * 0.30, -130, m
+      );
+      addConstellation(
+        [[0, 40], [-22, 12], [22, 14], [0, -30], [-26, -38], [28, -40]],
+        -w * 0.30, -h * 0.34, -140, m * 0.9
+      );
+      addConstellation(
+        [[-30, -18], [-8, -6], [14, -18], [36, -4], [22, 22], [0, 10], [-18, 20]],
+        -w * 0.40, h * 0.10, -160, m * 0.8
+      );
     }
 
     // --- 4. 随机生成一批星星的位置 ---
@@ -131,9 +256,9 @@
       brightColor = new THREE.Color(colors.bright);
       const dark = isDarkTheme();
 
-      // 暗色主题：星星数量更多、更大、更亮，形成“星光点点”的夜空
-      const normalCount = dark ? (isMobile ? 190 : 320) : (isMobile ? 140 : 240);
-      const brightCount = dark ? (isMobile ? 45 : 100) : (isMobile ? 35 : 70);
+      // 暗色主题：星星数量更多、更大、更亮，但控制总量保证页面流畅
+      const normalCount = dark ? (isMobile ? 150 : 260) : (isMobile ? 120 : 200);
+      const brightCount = dark ? (isMobile ? 40 : 80) : (isMobile ? 30 : 60);
       const normalSize = dark ? (isMobile ? 3.8 : 3.4) : (isMobile ? 3.2 : 3.0);
       const brightSize = dark ? (isMobile ? 5.8 : 5.2) : (isMobile ? 5.2 : 4.6);
 
@@ -141,6 +266,9 @@
       brightStars = makePoints(brightCount, brightSize, brightColor, dark ? 0.9 : 0.8);
       group.add(stars);
       group.add(brightStars);
+
+      // 月亮、行星与星座（同样挂在 group 下，跟随鼠标转动）
+      rebuildCelestial();
     }
 
     rebuildStars();
@@ -237,6 +365,7 @@
 
     const ctx = canvas.getContext("2d");
     let stars = [];
+    let celestials = [];
     let rafId = 0;
     let running = true;
     let w = 0;
@@ -261,6 +390,61 @@
           color: colors[Math.random() > 0.85 ? "bright" : "normal"]
         });
       }
+      makeCelestial2D();
+    }
+
+    // 2D 月亮、行星与星座（比星星更亮更明显，同样跟随鼠标视差）
+    function makeCelestial2D() {
+      const m = isMobile ? 0.75 : 1;
+      celestials = [
+        { type: "moon", x: w * 0.16, y: h * 0.18, r: 34 * m, depth: 0.20 },
+        { type: "mars", x: w * 0.84, y: h * 0.28, r: 15 * m, depth: 0.26 },
+        { type: "jupiter", x: w * 0.76, y: h * 0.78, r: 22 * m, depth: 0.22 },
+        { type: "saturn", x: w * 0.20, y: h * 0.76, r: 26 * m, depth: 0.24 },
+        { type: "venus", x: w * 0.90, y: h * 0.56, r: 11 * m, depth: 0.30 },
+        { type: "neptune", x: w * 0.36, y: h * 0.88, r: 14 * m, depth: 0.22 }
+      ];
+    }
+
+    function drawCelestial2D(offsetX, offsetY) {
+      for (const c of celestials) {
+        let dx = c.x - offsetX * c.depth;
+        let dy = c.y - offsetY * c.depth;
+        if (dx > w + 60) dx -= w + 120;
+        if (dx < -60) dx += w + 120;
+        if (dy > h + 60) dy -= h + 120;
+        if (dy < -60) dy += h + 120;
+
+        ctx.save();
+        ctx.globalAlpha = 0.95;
+        if (c.type === "saturn") {
+          const g = ctx.createRadialGradient(dx - c.r * 0.25, dy - c.r * 0.25, c.r * 0.1, dx, dy, c.r);
+          g.addColorStop(0, "#fff3c4"); g.addColorStop(1, "#b98a3e");
+          ctx.fillStyle = g;
+          ctx.beginPath(); ctx.arc(dx, dy, c.r, 0, Math.PI * 2); ctx.fill();
+          ctx.strokeStyle = "rgba(230,210,150,0.9)";
+          ctx.lineWidth = Math.max(2, c.r * 0.22);
+          ctx.beginPath(); ctx.ellipse(dx, dy, c.r * 1.8, c.r * 0.55, -0.42, 0, Math.PI * 2); ctx.stroke();
+        } else if (c.type === "moon") {
+          const g = ctx.createRadialGradient(dx - c.r * 0.3, dy - c.r * 0.3, c.r * 0.1, dx, dy, c.r);
+          g.addColorStop(0, "#ffffff"); g.addColorStop(1, "#9fb4c8");
+          ctx.fillStyle = g;
+          ctx.beginPath(); ctx.arc(dx, dy, c.r, 0, Math.PI * 2); ctx.fill();
+          ctx.fillStyle = "rgba(130,155,180,0.30)";
+          [[-0.3, -0.2], [0.2, 0.1], [0.25, -0.35], [-0.15, 0.3]].forEach((p) => {
+            ctx.beginPath(); ctx.arc(dx + c.r * p[0], dy + c.r * p[1], c.r * 0.16, 0, Math.PI * 2); ctx.fill();
+          });
+        } else {
+          const palettes = { mars: ["#ffb08a", "#c9432c"], jupiter: ["#ffe2b8", "#9c6238"], venus: ["#fff2c9", "#d9a94e"], neptune: ["#8fd8ff", "#2863c9"] };
+          const p = palettes[c.type] || palettes.neptune;
+          const g = ctx.createRadialGradient(dx - c.r * 0.25, dy - c.r * 0.25, c.r * 0.1, dx, dy, c.r);
+          g.addColorStop(0, p[0]); g.addColorStop(1, p[1]);
+          ctx.fillStyle = g;
+          ctx.beginPath(); ctx.arc(dx, dy, c.r, 0, Math.PI * 2); ctx.fill();
+        }
+        ctx.restore();
+      }
+      ctx.globalAlpha = 1;
     }
 
     function resize() {
@@ -283,6 +467,9 @@
       // 鼠标移动时，整片星空向反方向轻微偏移，产生视差
       const offsetX = mouse.active ? mouse.x * 52 : 0;
       const offsetY = mouse.active ? mouse.y * 34 : 0;
+
+      // 先画更大更亮的天体，再画细小星点
+      drawCelestial2D(offsetX, offsetY);
 
       for (const star of stars) {
         // 基础位置：慢慢向下飘；鼠标视差：近处星星位移更大
