@@ -82,6 +82,9 @@
       ctx.fillStyle = gradient;
       ctx.fillRect(0, 0, size, size);
       const texture = new THREE.CanvasTexture(canvas);
+      texture.minFilter = THREE.LinearFilter;   // 关闭 mipmap，纹理更清晰不发糊
+      texture.magFilter = THREE.LinearFilter;
+      texture.generateMipmaps = false;
       texture.needsUpdate = true;
       return texture;
     }
@@ -144,6 +147,9 @@
         }
       }
       const texture = new THREE.CanvasTexture(canvas);
+      texture.minFilter = THREE.LinearFilter;   // 关闭 mipmap，纹理更清晰不发糊
+      texture.magFilter = THREE.LinearFilter;
+      texture.generateMipmaps = false;
       texture.needsUpdate = true;
       return texture;
     }
@@ -186,28 +192,32 @@
     function rebuildCelestial() {
       const w = container.clientWidth || window.innerWidth;
       const h = container.clientHeight || window.innerHeight;
-      const m = isMobile ? 0.7 : 1;
+      const m = isMobile ? 0.6 : 1;
 
-      // 月亮 + 各大行星：比背景星星更大、更亮，会跟着整片星空一起随鼠标转动
-      addCelestialSprite("moon", -w * 0.32, -h * 0.26, -170, 120 * m, 0.98);
-      addCelestialSprite("mars", w * 0.34, h * 0.20, -140, 52 * m, 0.92);
-      addCelestialSprite("jupiter", w * 0.20, -h * 0.30, -120, 74 * m, 0.88);
-      addCelestialSprite("saturn", -w * 0.36, h * 0.28, -110, 110 * m, 0.92);
-      addCelestialSprite("venus", w * 0.42, -h * 0.10, -90, 44 * m, 0.90);
-      addCelestialSprite("neptune", -w * 0.16, h * 0.34, -150, 56 * m, 0.86);
+      // 天体全部贴在屏幕左右边缘，避开中间的文字内容；
+      // 跟随鼠标转动的幅度更大，鼠标离开网页后自动回到原位。
+      const leftX = isMobile ? -w * 0.02 : w * 0.03;
+      const rightX = isMobile ? w * 1.02 : w * 0.97;
 
-      // 星座连线：狮子座 / 猎户座 / 北斗七星
+      addCelestialSprite("moon", leftX, h * 0.08, -170, 110 * m, 0.99);
+      addCelestialSprite("mars", rightX, h * 0.16, -140, 52 * m, 0.94);
+      addCelestialSprite("jupiter", leftX, h * 0.42, -120, 72 * m, 0.90);
+      addCelestialSprite("saturn", rightX, h * 0.56, -110, 108 * m, 0.94);
+      addCelestialSprite("venus", leftX, h * 0.76, -90, 44 * m, 0.90);
+      addCelestialSprite("neptune", rightX, h * 0.86, -150, 56 * m, 0.88);
+
+      // 星座连线同样放在边缘空白处
       addConstellation(
         [[-36, -14], [-12, 4], [18, -2], [34, 12], [10, 26], [-8, 8]],
-        w * 0.28, h * 0.30, -130, m
+        rightX, h * 0.04, -130, m
       );
       addConstellation(
         [[0, 40], [-22, 12], [22, 14], [0, -30], [-26, -38], [28, -40]],
-        -w * 0.30, -h * 0.34, -140, m * 0.9
+        leftX, h * 0.30, -140, m * 0.8
       );
       addConstellation(
         [[-30, -18], [-8, -6], [14, -18], [36, -4], [22, 22], [0, 10], [-18, 20]],
-        -w * 0.40, h * 0.10, -160, m * 0.8
+        rightX, h * 0.74, -160, m * 0.7
       );
     }
 
@@ -295,23 +305,22 @@
       const t = (now - startTime) / 1000;
       const mouse = window.heroMouse || { x: 0, y: 0, active: false };
 
-      // 视角目标：鼠标在右边 -> 星云向右转；鼠标在下边 -> 星云向上仰，
-      // 再叠加一点点自动的缓慢摆动，像在宇宙里慢慢漂移。
+      // 视角目标：鼠标在右边 -> 星云向右转；鼠标在下边 -> 星云向上仰。
+      // 幅度加大，天体跟随更灵活；鼠标离开网页后 active=false，自动回到原位。
       const baseSway = Math.sin(t * 0.06) * 0.10;
-      const targetRotX = mouse.active ? mouse.y * 0.18 : 0;
-      const targetRotY = baseSway + (mouse.active ? mouse.x * 0.24 : 0);
+      const targetRotX = mouse.active ? mouse.y * 0.32 : 0;
+      const targetRotY = baseSway + (mouse.active ? mouse.x * 0.42 : 0);
 
-      // 平滑插值，避免星云“啪”地跳过去
-      rotX += (targetRotX - rotX) * 0.045;
-      rotY += (targetRotY - rotY) * 0.045;
+      rotX += (targetRotX - rotX) * 0.06;
+      rotY += (targetRotY - rotY) * 0.06;
       group.rotation.x = rotX;
       group.rotation.y = rotY;
 
-      // 相机也跟随鼠标轻微平移，增强“星空围绕地球鼠标”的沉浸感
-      const camTargetX = (mouse.active ? mouse.x : 0) * 46;
-      const camTargetY = (mouse.active ? -mouse.y : 0) * 28;
-      camera.position.x += (camTargetX - camera.position.x) * 0.04;
-      camera.position.y += (camTargetY - camera.position.y) * 0.04;
+      // 相机平移幅度同样加大
+      const camTargetX = (mouse.active ? mouse.x : 0) * 90;
+      const camTargetY = (mouse.active ? -mouse.y : 0) * 60;
+      camera.position.x += (camTargetX - camera.position.x) * 0.055;
+      camera.position.y += (camTargetY - camera.position.y) * 0.055;
       camera.lookAt(scene.position);
 
       // 两层星星以相反节奏“呼吸”，亮度此起彼伏
@@ -333,8 +342,23 @@
 
     // --- 7. 对外接口 ---
     return {
-      // 主题切换时调用：根据明暗主题重建星空的颜色、数量与亮度
-      setTheme() {
+      // 主题切换时调用：暗色显示星空；亮色隐藏星空（改由 sky-scene 画天地场景）
+      setTheme(theme) {
+        if (theme === "light") {
+          running = false;
+          cancelAnimationFrame(rafId);
+          renderer.domElement.style.display = "none";
+          return;
+        }
+        renderer.domElement.style.display = "block";
+        if (!running) {
+          running = true;
+          if (reduceMotion) {
+            renderer.render(scene, camera);
+          } else {
+            rafId = requestAnimationFrame(animate);
+          }
+        }
         rebuildStars();
         if (reduceMotion) renderer.render(scene, camera);
       },
@@ -393,16 +417,16 @@
       makeCelestial2D();
     }
 
-    // 2D 月亮、行星与星座（比星星更亮更明显，同样跟随鼠标视差）
+    // 2D 月亮、行星与星座（贴边摆放，避开文字；比星星更亮更明显，跟随鼠标视差）
     function makeCelestial2D() {
-      const m = isMobile ? 0.75 : 1;
+      const m = isMobile ? 0.65 : 1;
       celestials = [
-        { type: "moon", x: w * 0.16, y: h * 0.18, r: 34 * m, depth: 0.20 },
-        { type: "mars", x: w * 0.84, y: h * 0.28, r: 15 * m, depth: 0.26 },
-        { type: "jupiter", x: w * 0.76, y: h * 0.78, r: 22 * m, depth: 0.22 },
-        { type: "saturn", x: w * 0.20, y: h * 0.76, r: 26 * m, depth: 0.24 },
-        { type: "venus", x: w * 0.90, y: h * 0.56, r: 11 * m, depth: 0.30 },
-        { type: "neptune", x: w * 0.36, y: h * 0.88, r: 14 * m, depth: 0.22 }
+        { type: "moon", x: w * 0.04, y: h * 0.08, r: 34 * m, depth: 0.20 },
+        { type: "mars", x: w * 0.96, y: h * 0.20, r: 15 * m, depth: 0.26 },
+        { type: "jupiter", x: w * 0.04, y: h * 0.44, r: 22 * m, depth: 0.22 },
+        { type: "saturn", x: w * 0.96, y: h * 0.60, r: 26 * m, depth: 0.24 },
+        { type: "venus", x: w * 0.04, y: h * 0.78, r: 11 * m, depth: 0.30 },
+        { type: "neptune", x: w * 0.96, y: h * 0.88, r: 14 * m, depth: 0.22 }
       ];
     }
 
@@ -521,9 +545,22 @@
     }
 
     return {
-      setTheme() {
+      setTheme(theme) {
+        if (theme === "light") {
+          running = false;
+          cancelAnimationFrame(rafId);
+          canvas.style.display = "none";
+          return;
+        }
+        canvas.style.display = "block";
         makeStars(); // 主题变化后重新随机配色与数量
-        if (reduceMotion) draw(0); // 静态模式下也要重画一帧
+        if (!running) {
+          running = true;
+          if (reduceMotion) draw(0);
+          else rafId = requestAnimationFrame(draw);
+        } else if (reduceMotion) {
+          draw(0);
+        }
       },
       destroy() {
         running = false;

@@ -5,7 +5,7 @@
  *  1. 你只需要修改本文件里的“占位符文字”和“占位链接”，
  *     全站内容都会自动更新。
  *  2. 所有需要你修改的地方都用中文注释标注了 【必改】或【可选】。
- *  3. 未填写的内容统一用“（温景淇还没有写这部分）”代替。
+ *  3. 未填写的内容统一用“（温景淇还没有写这部分的代码）”代替。
  * =====================================================================
  */
 const SITE_CONFIG = {
@@ -214,10 +214,10 @@ const SITE_CONFIG = {
 
     items: [
       {
-        time: "（温景淇还没有写这部分）",
-        name: "（温景淇还没有写这部分）",
-        role: "（温景淇还没有写这部分）",
-        desc: "（温景淇还没有写这部分）",
+        time: "（温景淇还没有写这部分的代码）",
+        name: "（温景淇还没有写这部分的代码）",
+        role: "（温景淇还没有写这部分的代码）",
+        desc: "（温景淇还没有写这部分的代码）",
         tags: ["待拓展"]
       }
     ]
@@ -234,9 +234,9 @@ const SITE_CONFIG = {
 
     items: [
       {
-        title: "（温景淇还没有写这部分）",
+        title: "（温景淇还没有写这部分的代码）",
         category: "嵌入式",
-        summary: "（温景淇还没有写这部分）",
+        summary: "（温景淇还没有写这部分的代码）",
         cover: "assets/project-cover.svg",
         tags: ["待拓展"],
         github: "#",
@@ -254,10 +254,10 @@ const SITE_CONFIG = {
 
     items: [
       {
-        time: "（温景淇还没有写这部分）",
-        name: "（温景淇还没有写这部分）",
-        level: "（温景淇还没有写这部分）",
-        desc: "（温景淇还没有写这部分）",
+        time: "（温景淇还没有写这部分的代码）",
+        name: "（温景淇还没有写这部分的代码）",
+        level: "（温景淇还没有写这部分的代码）",
+        desc: "（温景淇还没有写这部分的代码）",
         tags: ["待拓展"]
       }
     ]
@@ -272,10 +272,10 @@ const SITE_CONFIG = {
 
     items: [
       {
-        date: "（温景淇还没有写这部分）",
-        title: "（温景淇还没有写这部分）",
+        date: "（温景淇还没有写这部分的代码）",
+        title: "（温景淇还没有写这部分的代码）",
         category: "待拓展",
-        summary: "（温景淇还没有写这部分）",
+        summary: "（温景淇还没有写这部分的代码）",
         link: "#"
       }
     ]
@@ -289,9 +289,9 @@ const SITE_CONFIG = {
     subtitle: "学习之外的生活记录 · 点击照片可放大查看",
 
     photos: [
-      { src: "assets/photo-1.svg", title: "（温景淇还没有写这部分）", desc: "（温景淇还没有写这部分）", date: "待拓展" },
-      { src: "assets/photo-2.svg", title: "（温景淇还没有写这部分）", desc: "（温景淇还没有写这部分）", date: "待拓展" },
-      { src: "assets/photo-3.svg", title: "（温景淇还没有写这部分）", desc: "（温景淇还没有写这部分）", date: "待拓展" }
+      { src: "assets/photo-1.svg", title: "（温景淇还没有写这部分的代码）", desc: "（温景淇还没有写这部分的代码）", date: "待拓展" },
+      { src: "assets/photo-2.svg", title: "（温景淇还没有写这部分的代码）", desc: "（温景淇还没有写这部分的代码）", date: "待拓展" },
+      { src: "assets/photo-3.svg", title: "（温景淇还没有写这部分的代码）", desc: "（温景淇还没有写这部分的代码）", date: "待拓展" }
     ]
   },
 
@@ -305,8 +305,8 @@ const SITE_CONFIG = {
     cards: [
       { type: "github", label: "GitHub", value: "jingqiwen", url: "https://github.com/jingqiwen", action: "link" },
       { type: "email", label: "邮箱", value: "2175414607@qq.com", url: "", action: "copy" },
-      { type: "qq", label: "QQ", value: "（温景淇还没有写这部分）", url: "", action: "copy" },
-      { type: "bilibili", label: "哔哩哔哩", value: "（温景淇还没有写这部分）", url: "https://space.bilibili.com/你的UID", action: "link" }
+      { type: "qq", label: "QQ", value: "（温景淇还没有写这部分的代码）", url: "", action: "copy" },
+      { type: "bilibili", label: "哔哩哔哩", value: "（温景淇还没有写这部分的代码）", url: "https://space.bilibili.com/你的UID", action: "link" }
     ]
   },
 
@@ -315,7 +315,7 @@ const SITE_CONFIG = {
    * ------------------------------------------------------------------ */
   footer: {
     copyright: "温景淇",
-    icp: "（温景淇还没有写这部分）",
+    icp: "（温景淇还没有写这部分的代码）",
     statsEnabled: true
   }
 };

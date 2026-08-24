@@ -64,11 +64,18 @@
   </header>
 
   <!-- ================================================================
-       全站星空层：固定在视口最底层，覆盖首页和所有版块。
+       全站星空层（暗色主题）：固定在视口最底层，覆盖首页和所有版块。
        three-bg.js 把 canvas 画到这里：鼠标静止时星星自动流动/闪烁，
        鼠标（地球光标）移动时整片星空跟随视角变化。
        ================================================================ -->
   <div class="star-field" id="star-field" aria-hidden="true"></div>
+
+  <!-- ================================================================
+       亮色主题“宇宙 → 天空 → 大地”场景层（sky-scene.js 绘制）：
+       随滚动高度出现火箭/卫星/飞机/无人机/热气球/树木/智能设备等，
+       同样跟随鼠标移动；鼠标移出网页后所有物体回到原位。
+       ================================================================ -->
+  <div class="sky-scene" id="sky-scene" aria-hidden="true"></div>
 
   <!-- ================================================================
        左侧“银河目录”跳转栏：固定悬浮按钮 + 可展开面板
@@ -275,6 +282,7 @@
   <script defer src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
   <script defer src="js/config.js"></script>
   <script defer src="js/three-bg.js"></script>
+  <script defer src="js/sky-scene.js"></script>
   <script defer src="js/main.js"></script>
 
   <!-- 不蒜子访问量统计脚本（在 config.js 中把 statsEnabled 设为 false 可不显示） -->

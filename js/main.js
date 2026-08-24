@@ -156,9 +156,13 @@
     const metaTheme = document.querySelector('meta[name="theme-color"]');
     if (metaTheme) metaTheme.content = theme === "dark" ? "#081426" : "#29b6f6";
 
-    // 通知星空背景换色
+    // 通知星空背景换色（暗色显示星空；亮色隐藏星空，改显示天地场景）
     if (window.heroBackground && window.heroBackground.setTheme) {
       window.heroBackground.setTheme(theme);
+    }
+    // 亮色主题的“宇宙 → 天空 → 大地”场景
+    if (window.skyScene && window.skyScene.setTheme) {
+      window.skyScene.setTheme(theme);
     }
     // 通知贪吃蛇重绘（在它创建之后会注册这个回调）
     if (window.snakeOnThemeChange) window.snakeOnThemeChange(theme);
@@ -568,9 +572,11 @@
     this.effectUntil = 0;
 
     // 死亡 / 编号 / 成就 / 通关 / 智慧之星
-    this.serial = 1;               // 温景淇001号
     this.deathCount = 0;
     this.hasPassed = false;        // 长度是否达到 15（通关一次）
+    this.firstDeathAt = 0;         // 第一次死亡的时间戳（智慧之星要求先死后通关）
+    this.firstPassAt = 0;          // 第一次通关的时间戳
+    this.serial = 1;               // 温景淇001号
     this.deathReason = "";
     this.deathRestartAt = 0;
     this.deathTimer = 0;
@@ -579,12 +585,19 @@
     this.deathParticleRaf = 0;
     this.achievements = this.config.achievements || [];
 
-    // 智慧之星：死亡一次 + 通关一次后点亮；点亮后游戏机亮度 +30%
+    // 重新进入/刷新网页时，恢复死亡次数、通关记录、蛇身编号和智慧之星
     this.wisdomLit = false;
     try {
-      this.wisdomLit = localStorage.getItem("wjq-wisdom-star") === "1";
+      const saved = JSON.parse(localStorage.getItem("wjq-snake-progress") || "{}");
+      this.deathCount = Number(saved.deathCount) || 0;
+      this.hasPassed = !!(saved.hasPassed);
+      this.firstDeathAt = Number(saved.firstDeathAt) || 0;
+      this.firstPassAt = Number(saved.firstPassAt) || 0;
+      this.serial = Number(saved.serial) || (this.deathCount + 1);
+      // 智慧之星：必须“先死一次，再通关一次”，即首次通关时间晚于首次死亡时间
+      this.wisdomLit = this.firstDeathAt > 0 && this.firstPassAt > 0 && this.firstPassAt > this.firstDeathAt;
     } catch (error) {
-      // 隐私模式无法读取本地存储时忽略
+      // 没有记录或解析失败时，按全新进度开始
     }
 
     this.ctx = null;
@@ -775,17 +788,34 @@
     if (this.scoreEl) this.scoreEl.textContent = "长度 " + this.score;
   };
 
-  // 智慧之星：死亡一次 + 通关一次后点亮；点亮后游戏机亮度提升 30%
+  // 保存进度：死亡次数 / 通关记录 / 蛇身编号 / 智慧之星，刷新后不丢失
+  SnakeGame.prototype.saveProgress = function () {
+    try {
+      localStorage.setItem(
+        "wjq-snake-progress",
+        JSON.stringify({
+          deathCount: this.deathCount,
+          hasPassed: this.hasPassed,
+          firstDeathAt: this.firstDeathAt,
+          firstPassAt: this.firstPassAt,
+          serial: this.serial,
+          wisdomLit: this.wisdomLit
+        })
+      );
+    } catch (error) {
+      // 隐私模式无法保存时忽略
+    }
+  };
+
+  // 智慧之星：必须先死一次、再通关一次，即 firstPassAt 晚于 firstDeathAt
   SnakeGame.prototype.updateWisdomStar = function () {
-    const shouldLit = !!(this.deathCount >= 1 && this.hasPassed);
+    const shouldLit = this.firstDeathAt > 0 && this.firstPassAt > 0 && this.firstPassAt > this.firstDeathAt;
     if (shouldLit && !this.wisdomLit) {
       this.wisdomLit = true;
-      try {
-        localStorage.setItem("wjq-wisdom-star", "1");
-      } catch (error) {
-        // 忽略存储失败
-      }
+      this.saveProgress();
+      showToast("🌟 智慧之星已点亮：游戏机亮度提升 30%");
     }
+    if (this.wisdomLit) this.saveProgress();
 
     if (this.starEl) {
       this.starEl.classList.toggle("lit", this.wisdomLit);
@@ -986,10 +1016,14 @@
     this.deathReason = reason;
     this.deathCount += 1;
     this.serial += 1;
+    if (!this.firstDeathAt) this.firstDeathAt = Date.now(); // 记录第一次死亡时间
     this.stopLoop();
     this.stopHold();
 
     if (this.serialEl) this.serialEl.textContent = this.serialText();
+
+    // 每死一次都保存记录（死亡次数 / 编号 / 智慧之星），刷新不丢失
+    this.saveProgress();
 
     // 每死一次都弹一个四字成语成就（列表循环使用）
     const deathAchievements = this.achievements || [];
@@ -1138,13 +1172,18 @@
 
     // 通关判定：长度达到配置值（默认 15）时提示通关并解锁“学海无涯”成就
     const passLength = Number(this.config.passLength || 15);
-    if (!this.hasPassed && this.score >= passLength) {
+    if (this.score >= passLength) {
+      const firstTimePass = !this.hasPassed;
       this.hasPassed = true;
-      const passAchievement = this.config.passAchievement || {};
-      // 通关提示里附带当前时间，方便记录“这一刻”
-      const passTime = new Date().toLocaleTimeString("zh-CN", { hour12: false });
-      showToast("🏅 " + passTime + " · " + (this.config.passMessage || "恭喜通关！"));
-      pushAchievement(passAchievement.name || "学海无涯", passAchievement.quote || "学宜学，深益深。    ——温景淇");
+      this.firstPassAt = Date.now(); // 更新通关时间；智慧之星要求它晚于第一次死亡
+      if (firstTimePass) {
+        const passAchievement = this.config.passAchievement || {};
+        // 通关提示里附带当前时间，方便记录“这一刻”
+        const passTime = new Date().toLocaleTimeString("zh-CN", { hour12: false });
+        showToast("🏅 " + passTime + " · " + (this.config.passMessage || "恭喜通关！"));
+        pushAchievement(passAchievement.name || "学海无涯", passAchievement.quote || "学宜学，深益深。    ——温景淇");
+      }
+      this.saveProgress();
       this.updateWisdomStar();
     }
 
