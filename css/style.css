@@ -250,6 +250,34 @@ button {
   gap: 8px;
 }
 
+/* 主题切换指路牌：位于切换按钮左侧，箭头指向按钮 */
+.theme-sign {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--primary-strong);
+  background: var(--surface);
+  border: 1px dashed var(--border-strong);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  white-space: nowrap;
+  box-shadow: 0 4px 14px rgba(41, 182, 246, 0.14);
+}
+
+.theme-sign-arrow {
+  display: inline-block;
+  animation: sign-arrow 1.6s ease-in-out infinite;
+}
+
+@keyframes sign-arrow {
+  0%, 100% { transform: translateX(-2px); opacity: 0.7; }
+  50%      { transform: translateX(3px);  opacity: 1; }
+}
+
 /* 右上角圆形图标按钮（主题切换 / 汉堡菜单） */
 .icon-btn {
   width: 42px;
@@ -320,6 +348,286 @@ button {
 }
 
 /* ---------------------------------------------------------------------
+ * 三点五、左侧银河目录（悬浮跳转栏） + 地球鼠标
+ * --------------------------------------------------------------------- */
+/* 目录开关按钮：左中悬浮的“小行星” */
+.toc-toggle {
+  position: fixed;
+  left: 18px;
+  top: 50%;
+  z-index: 140;
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  transform: translateY(-50%);
+  background: var(--gradient);
+  color: #fff;
+  box-shadow: 0 10px 30px rgba(41, 182, 246, 0.45), 0 0 0 4px rgba(127, 224, 255, 0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.toc-toggle:hover {
+  transform: translateY(-50%) scale(1.08);
+  box-shadow: 0 14px 40px rgba(41, 182, 246, 0.60), 0 0 0 6px rgba(127, 224, 255, 0.28);
+}
+
+.toc-toggle-icon {
+  font-size: 26px;
+  animation: toc-planet-float 3.5s ease-in-out infinite;
+}
+
+@keyframes toc-planet-float {
+  0%, 100% { transform: translateY(-2px); }
+  50%      { transform: translateY(2px); }
+}
+
+/* 小行星按钮上的呼吸光点 */
+.toc-toggle-dot {
+  position: absolute;
+  right: 4px;
+  top: 4px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 10px #fff;
+  animation: toc-dot 1.8s ease-in-out infinite;
+}
+
+@keyframes toc-dot {
+  0%, 100% { opacity: 0.4; transform: scale(0.8); }
+  50%      { opacity: 1;   transform: scale(1.15); }
+}
+
+/* 展开后的目录面板：位于开关按钮右侧 */
+.toc-panel {
+  position: fixed;
+  left: 88px;
+  top: 50%;
+  z-index: 139;
+  width: 288px;
+  max-height: min(84vh, 760px);
+  overflow-y: auto;
+  padding: 18px 16px 16px;
+  border-radius: 22px;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  box-shadow: var(--shadow-hover), 0 0 40px rgba(41, 182, 246, 0.18);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  transform: translateY(-50%) translateX(14px);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.3s, transform 0.3s, visibility 0.3s;
+}
+
+.toc-panel.open {
+  transform: translateY(-50%) translateX(0);
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.toc-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 2px 4px 12px;
+  border-bottom: 1px dashed var(--border);
+  margin-bottom: 12px;
+}
+
+.toc-head-text strong {
+  display: block;
+  font-size: 1.02rem;
+  background: var(--gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.toc-head-text small {
+  display: block;
+  margin-top: 2px;
+  font-size: 0.74rem;
+  color: var(--text-weak);
+}
+
+.toc-close {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--surface-solid);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  font-size: 18px;
+  line-height: 1;
+  transition: color 0.2s, border-color 0.2s, transform 0.2s;
+}
+
+.toc-close:hover {
+  color: var(--primary-strong);
+  border-color: var(--border-strong);
+  transform: rotate(90deg);
+}
+
+/* 版块跳转按钮列表 */
+.toc-links {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.toc-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border-radius: 14px;
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+  font-weight: 600;
+  border: 1px solid transparent;
+  transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.2s;
+}
+
+.toc-link:hover {
+  color: var(--primary-strong);
+  background: var(--surface-solid);
+  border-color: var(--border);
+  transform: translateX(3px);
+}
+
+.toc-link.active {
+  color: #fff;
+  background: var(--gradient);
+  border-color: transparent;
+  box-shadow: 0 6px 18px rgba(41, 182, 246, 0.40);
+}
+
+.toc-link-icon {
+  width: 26px;
+  text-align: center;
+  font-size: 1rem;
+}
+
+/* 目录结尾：银河天体导航 */
+.toc-celestial-title {
+  margin: 16px 6px 8px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-weak);
+  letter-spacing: 1px;
+}
+
+.toc-celestial {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.celestial-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 4px 8px;
+  border-radius: 14px;
+  background: var(--surface-solid);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s, color 0.25s;
+}
+
+.celestial-btn:hover {
+  transform: translateY(-4px);
+  color: var(--primary-strong);
+  border-color: var(--border-strong);
+  box-shadow: 0 8px 20px rgba(41, 182, 246, 0.28);
+}
+
+.celestial-icon { font-size: 1.35rem; line-height: 1; }
+.celestial-name { font-size: 0.7rem; font-weight: 600; }
+
+/* 地球鼠标：进入网站后替换默认鼠标，持续自转 */
+.earth-cursor {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 400;
+  width: 42px;
+  height: 42px;
+  margin: 0;
+  pointer-events: none;
+  opacity: 0;
+  will-change: transform;
+}
+
+.earth-cursor-spin {
+  position: absolute;
+  inset: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+  line-height: 1;
+  filter: drop-shadow(0 0 8px rgba(127, 224, 255, 0.85));
+  animation: earth-spin 7s linear infinite;
+}
+
+.earth-cursor-orbit {
+  position: absolute;
+  inset: -5px;
+  border: 1px dashed rgba(127, 216, 255, 0.55);
+  border-radius: 50%;
+  animation: earth-orbit 4.5s linear infinite;
+}
+
+.earth-cursor-glow {
+  position: absolute;
+  inset: 4px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(127, 224, 255, 0.5), transparent 70%);
+  animation: cursor-glow 2.4s ease-in-out infinite;
+}
+
+@keyframes earth-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+@keyframes earth-orbit {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(-360deg); }
+}
+
+@keyframes cursor-glow {
+  0%, 100% { opacity: 0.4; transform: scale(0.85); }
+  50%      { opacity: 0.9; transform: scale(1.1); }
+}
+
+/* 悬停可点击元素时：地球放大一点、轨道更亮 */
+.earth-cursor.cursor-hover .earth-cursor-spin { font-size: 36px; }
+.earth-cursor.cursor-hover .earth-cursor-orbit { border-color: rgba(127, 224, 255, 0.95); box-shadow: 0 0 14px rgba(127, 224, 255, 0.6); }
+
+/* 启用地球鼠标后隐藏系统默认光标 */
+body.earth-cursor-active,
+body.earth-cursor-active * {
+  cursor: none !important;
+}
+
+/* 触屏设备（没有鼠标）不显示地球光标 */
+@media (hover: none), (pointer: coarse) {
+  .earth-cursor { display: none; }
+  body.earth-cursor-active, body.earth-cursor-active * { cursor: auto !important; }
+}
+
+/* ---------------------------------------------------------------------
  * 四、首屏 Hero（第一屏）
  * --------------------------------------------------------------------- */
 .hero {
@@ -329,6 +637,20 @@ button {
   align-items: center;
   padding: 110px 0 90px;
   overflow: hidden;
+}
+
+/* 深色主题：首屏叠加更深的夜空渐变，让星光更明显 */
+:root[data-theme="dark"] .hero {
+  background:
+    radial-gradient(110% 80% at 72% 16%, rgba(11, 39, 74, 0.72), transparent 58%),
+    radial-gradient(110% 80% at 18% 84%, rgba(5, 24, 48, 0.86), transparent 60%);
+}
+
+/* 浅色主题：首屏保持清晨天空的通透感 */
+:root[data-theme="light"] .hero {
+  background:
+    radial-gradient(110% 80% at 72% 16%, rgba(226, 247, 255, 0.65), transparent 58%),
+    radial-gradient(110% 80% at 18% 84%, rgba(255, 255, 255, 0.55), transparent 60%);
 }
 
 /* 粒子背景层：固定在首屏内部 */
@@ -346,6 +668,29 @@ button {
   height: 100%;
   display: block;
   z-index: 1; /* 在光斑之上、内容之下 */
+}
+
+/* 流星：周期性地从夜空划过 */
+.shooting-star {
+  position: absolute;
+  z-index: 2;
+  width: 150px;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.95), rgba(127, 216, 255, 0.45), transparent);
+  filter: drop-shadow(0 0 6px rgba(127, 216, 255, 0.85));
+  opacity: 0;
+  pointer-events: none;
+}
+
+.shooting-1 { top: 14%; left: 64%; animation: shooting-star 10s ease-in 2s infinite; }
+.shooting-2 { top: 30%; left: 84%; animation: shooting-star 15s ease-in 9s infinite; }
+
+@keyframes shooting-star {
+  0%   { opacity: 0; transform: translate3d(0, 0, 0) rotate(-32deg); }
+  2%   { opacity: 0.95; }
+  11%  { opacity: 0; transform: translate3d(-340px, 210px, 0) rotate(-32deg); }
+  100% { opacity: 0; transform: translate3d(-340px, 210px, 0) rotate(-32deg); }
 }
 
 /* ---- 首屏动态光影层：光斑 / 光束 / 光尘 ---- */
@@ -1232,6 +1577,86 @@ button {
 }
 
 /* ---------------------------------------------------------------------
+ * 九点五、参加比赛及获奖情况 + 我的笔记
+ * --------------------------------------------------------------------- */
+/* 获奖卡片：两列网格 */
+.awards-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 26px;
+}
+
+.award-card { padding: 26px 28px; }
+
+.award-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.award-icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  background: var(--gradient);
+  box-shadow: 0 6px 18px rgba(41, 182, 246, 0.40);
+}
+
+.award-time {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #fff;
+  background: var(--gradient);
+  padding: 4px 12px;
+  border-radius: 999px;
+}
+
+.award-name { font-size: 1.06rem; font-weight: 700; margin-top: 14px; }
+.award-level { color: var(--primary-strong); font-size: 0.86rem; font-weight: 600; margin-top: 4px; }
+.award-desc { color: var(--text-secondary); font-size: 0.92rem; margin-top: 10px; }
+
+/* 笔记卡片：三列网格 */
+.notes-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 26px;
+}
+
+.note-card {
+  display: flex;
+  flex-direction: column;
+  padding: 26px 28px;
+}
+
+.note-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.note-category {
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--primary-strong);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 3px 12px;
+  border-radius: 999px;
+}
+
+.note-date { font-size: 0.78rem; color: var(--text-weak); }
+
+.note-title { font-size: 1.08rem; font-weight: 700; margin-top: 14px; }
+.note-summary { color: var(--text-secondary); font-size: 0.9rem; margin-top: 10px; flex: 1; }
+
+/* ---------------------------------------------------------------------
  * 十、光影瞬间（照片墙）
  * --------------------------------------------------------------------- */
 .gallery-grid {
@@ -1602,6 +2027,12 @@ button {
 /* ---------------------------------------------------------------------
  * 十五、响应式适配（平板 / 手机）
  * --------------------------------------------------------------------- */
+/* 中等宽度：只保留指路牌箭头，避免导航栏太挤 */
+@media (max-width: 900px) {
+  .theme-sign-text { display: none; }
+  .theme-sign { padding: 6px 10px; }
+}
+
 @media (max-width: 1024px) {
   /* 首屏改成上下排列：文字在上、贪吃蛇在下 */
   .hero { padding-top: 120px; }
@@ -1616,6 +2047,9 @@ button {
 
   /* 照片墙改为两列 */
   .gallery-grid { grid-template-columns: repeat(2, 1fr); }
+
+  /* 笔记改为两列 */
+  .notes-grid { grid-template-columns: repeat(2, 1fr); }
 }
 
 @media (max-width: 768px) {
@@ -1629,6 +2063,34 @@ button {
   .project-grid { grid-template-columns: 1fr; }
   .contact-grid { grid-template-columns: repeat(2, 1fr); }
 
+  /* 获奖与笔记改为单列 */
+  .awards-grid { grid-template-columns: 1fr; }
+  .notes-grid { grid-template-columns: 1fr; }
+
+  /* 银河目录改为左下角悬浮 + 底部弹出面板 */
+  .toc-toggle {
+    left: 14px;
+    top: auto;
+    bottom: 18px;
+    transform: none;
+    width: 54px;
+    height: 54px;
+  }
+
+  .toc-toggle:hover { transform: scale(1.08); }
+
+  .toc-panel {
+    left: 14px;
+    right: 14px;
+    top: auto;
+    bottom: 84px;
+    width: auto;
+    max-height: 64vh;
+    transform: translateY(24px);
+  }
+
+  .toc-panel.open { transform: translateY(0); }
+
   .lightbox { padding: 6vh 14px; }
   .lightbox-prev { left: 8px; }
   .lightbox-next { right: 8px; }
@@ -1637,6 +2099,8 @@ button {
 @media (max-width: 520px) {
   .navbar-inner { height: 62px; }
   .brand { font-size: 1rem; }
+  .theme-sign-text { display: none; }
+  .theme-sign { padding: 6px 10px; }
 
   .hero { min-height: auto; padding: 100px 0 84px; }
   .hero-name { font-size: 2.2rem; }

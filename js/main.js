@@ -20,17 +20,21 @@
     }
 
     applyGlobalConfig();   // 标题、图标、默认主题
+    initEarthCursor();     // 地球鼠标（并把鼠标坐标共享给星空背景）
     renderNav();           // 顶部导航
+    renderToc();           // 左侧银河目录
     renderHero();          // 首屏（含贪吃蛇）
     renderSectionHeads();  // 各版块标题
     renderAbout();         // 关于我 + 教育经历
     renderSkills();        // 技能
-    renderResearch();      // 科研经历
-    renderProjects();      // 项目展示
+    renderResearch();      // 项目经历
+    renderAwards();        // 参加比赛及获奖情况
+    renderProjects();      // 项目成果展示及资料
+    renderNotes();         // 我的笔记
     renderGallery();       // 光影瞬间照片墙
     renderContact();       // 联系我
     renderFooter();        // 页脚版权
-    bindGlobalEvents();    // 滚动、菜单、主题等事件
+    bindGlobalEvents();    // 滚动、菜单、主题、目录等事件
     observeReveals();      // 滚动入场动画
     initBusuanziCheck();   // 访问量统计兜底提示
   }
@@ -120,14 +124,15 @@
       if (link) link.href = SITE_CONFIG.favicon;
     }
 
-    // 读取浏览器记住的主题；没有记录则用 config.js 里的默认主题
+    // 读取浏览器记住的主题；没有记录则用 config.js 里的默认主题（现在默认是暗色）
+    // 使用 v2 存储键：本版要求“打开即暗色”，避免沿用旧版保存的亮色记录
     let savedTheme = "";
     try {
-      savedTheme = localStorage.getItem("site-theme") || "";
+      savedTheme = localStorage.getItem("site-theme-v2") || "";
     } catch (error) {
       // 个别浏览器（隐私模式）禁用 localStorage，忽略即可
     }
-    const theme = savedTheme || SITE_CONFIG.defaultTheme || "light";
+    const theme = savedTheme || SITE_CONFIG.defaultTheme || "dark";
     applyTheme(theme);
   }
 
@@ -136,7 +141,7 @@
     if (theme !== "light" && theme !== "dark") theme = "light";
     document.documentElement.setAttribute("data-theme", theme);
     try {
-      localStorage.setItem("site-theme", theme);
+      localStorage.setItem("site-theme-v2", theme);
     } catch (error) {
       // 存储失败不影响功能
     }
@@ -165,6 +170,77 @@
   }
 
   /* ------------------------------------------------------------------
+   * 一.五、地球鼠标 + 星空鼠标追踪数据
+   *   地球持续自转；鼠标坐标写入 window.heroMouse，three-bg.js 每帧读取，
+   *   让星光视角跟随“地球”移动而变化。触屏设备自动跳过。
+   * ------------------------------------------------------------------ */
+  function initEarthCursor() {
+    const cursor = $("earth-cursor");
+    if (!cursor) return;
+
+    // 只支持有真实鼠标的设备（触屏不启用，保留原生触摸体验）
+    const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)");
+    if (!finePointer.matches) {
+      cursor.style.display = "none";
+      return;
+    }
+
+    document.body.classList.add("earth-cursor-active");
+
+    // 给星空背景共享鼠标坐标（x/y 范围 -1 ~ 1）
+    window.heroMouse = { x: 0, y: 0, active: false };
+
+    let targetX = window.innerWidth / 2;
+    let targetY = window.innerHeight / 2;
+    let currentX = targetX;
+    let currentY = targetY;
+    let visible = false;
+
+    // 记录鼠标位置，并让地球光标出现
+    document.addEventListener("mousemove", (event) => {
+      targetX = event.clientX;
+      targetY = event.clientY;
+      window.heroMouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+      window.heroMouse.y = (event.clientY / window.innerHeight) * 2 - 1;
+      window.heroMouse.active = true;
+      if (!visible) {
+        visible = true;
+        cursor.style.opacity = "1";
+      }
+    });
+
+    // 鼠标离开窗口时藏起地球，避免停在边缘碍眼
+    document.addEventListener("mouseleave", () => {
+      visible = false;
+      cursor.style.opacity = "0";
+      window.heroMouse.active = false;
+    });
+
+    // 悬停在可点击元素上时，地球稍微放大并点亮轨道
+    const interactiveSelector = "a, button, .photo-card, .contact-card, .project-card, .toc-link, .celestial-btn";
+    document.addEventListener("mouseover", (event) => {
+      if (event.target.closest && event.target.closest(interactiveSelector)) {
+        cursor.classList.add("cursor-hover");
+      }
+    });
+    document.addEventListener("mouseout", (event) => {
+      if (event.target.closest && event.target.closest(interactiveSelector)) {
+        cursor.classList.remove("cursor-hover");
+      }
+    });
+
+    // 平滑跟随：地球不是生硬地贴在鼠标上，而是像小行星一样飘过去
+    function follow() {
+      currentX += (targetX - currentX) * 0.16;
+      currentY += (targetY - currentY) * 0.16;
+      // 42 是光标尺寸的一半，保证地球中心对准鼠标热点
+      cursor.style.transform = "translate3d(" + (currentX - 21) + "px," + (currentY - 21) + "px,0)";
+      requestAnimationFrame(follow);
+    }
+    requestAnimationFrame(follow);
+  }
+
+  /* ------------------------------------------------------------------
    * 二、渲染顶部导航栏
    * ------------------------------------------------------------------ */
   function renderNav() {
@@ -178,15 +254,60 @@
         "<span>" + escapeHtml(nav.brand) + "</span>";
     }
 
-    // 桌面端 + 移动端链接
-    const linksHtml = (nav.links || [])
-      .map((link) => '<a href="#' + escapeHtml(link.id) + '">' + escapeHtml(link.text) + "</a>")
+    // 顶部导航只显示 bar !== false 的条目（其余条目在左侧银河目录里）
+    const barLinks = (nav.links || []).filter((link) => link.bar !== false);
+    // 桌面端 + 移动端链接；data-nav-id 供滚动监听高亮使用
+    const linksHtml = barLinks
+      .map(
+        (link) =>
+          '<a href="#' + escapeHtml(link.id) + '" data-nav-id="' + escapeHtml(link.id) + '">' +
+          escapeHtml(link.text) + "</a>"
+      )
       .join("");
 
     const desktopNav = $("nav-links");
     const mobileNav = $("mobile-menu");
     if (desktopNav) desktopNav.innerHTML = linksHtml;
     if (mobileNav) mobileNav.innerHTML = linksHtml;
+  }
+
+  // 渲染左侧“银河目录”面板：全部版块 + 结尾的天体导航
+  function renderToc() {
+    if (SITE_CONFIG.toc && SITE_CONFIG.toc.enabled === false) {
+      const toggle = $("toc-toggle");
+      const panel = $("toc-panel");
+      if (toggle) toggle.style.display = "none";
+      if (panel) panel.style.display = "none";
+      return;
+    }
+
+    const toc = SITE_CONFIG.toc || {};
+    if (toc.panelTitle) $("toc-title").textContent = toc.panelTitle;
+    if (toc.panelSubtitle) $("toc-subtitle").textContent = toc.panelSubtitle;
+    if (toc.celestialTitle) $("toc-celestial-title").textContent = toc.celestialTitle;
+
+    // 全部版块跳转按钮
+    $("toc-links").innerHTML = (SITE_CONFIG.nav.links || [])
+      .map(
+        (link) =>
+          '<a class="toc-link" href="#' + escapeHtml(link.id) + '" data-nav-id="' + escapeHtml(link.id) + '">' +
+          '  <span class="toc-link-icon">' + escapeHtml(link.icon || "•") + "</span>" +
+          "  <span>" + escapeHtml(link.text) + "</span>" +
+          "</a>"
+      )
+      .join("");
+
+    // 结尾的银河天体导航按钮（金星/火星/木星/土星/人造卫星/狮子座等）
+    $("toc-celestial").innerHTML = (toc.celestial || [])
+      .map(
+        (item) =>
+          '<button type="button" class="celestial-btn" data-target="' + escapeHtml(item.id) + '" title="' +
+          escapeHtml(item.name + " · " + (item.tip || "前往该版块")) + '">' +
+          '  <span class="celestial-icon">' + escapeHtml(item.icon || "🌟") + "</span>" +
+          '  <span class="celestial-name">' + escapeHtml(item.name) + "</span>" +
+          "</button>"
+      )
+      .join("");
   }
 
   /* ------------------------------------------------------------------
@@ -771,7 +892,9 @@
       about: SITE_CONFIG.about,
       skills: SITE_CONFIG.skills,
       research: SITE_CONFIG.research,
+      awards: SITE_CONFIG.awards,
       projects: SITE_CONFIG.projects,
+      notes: SITE_CONFIG.notes,
       gallery: SITE_CONFIG.gallery,
       contact: SITE_CONFIG.contact
     };
@@ -918,6 +1041,31 @@
   }
 
   /* ------------------------------------------------------------------
+   * 七.五、渲染参加比赛及获奖情况
+   * ------------------------------------------------------------------ */
+  function renderAwards() {
+    const awards = SITE_CONFIG.awards || { items: [] };
+    const grid = $("awards-grid");
+    if (!grid) return;
+
+    grid.innerHTML = (awards.items || [])
+      .map(
+        (item) =>
+          '<article class="award-card glass-card reveal">' +
+          '  <div class="award-top">' +
+          '    <span class="award-icon">🏆</span>' +
+          '    <span class="award-time">' + escapeHtml(item.time) + "</span>" +
+          "  </div>" +
+          '  <h3 class="award-name">' + escapeHtml(item.name) + "</h3>" +
+          '  <p class="award-level">' + escapeHtml(item.level || "") + "</p>" +
+          '  <p class="award-desc">' + escapeHtml(item.desc || "") + "</p>" +
+          tagRow(item.tags) +
+          "</article>"
+      )
+      .join("");
+  }
+
+  /* ------------------------------------------------------------------
    * 八、渲染项目展示（含分类筛选）
    * ------------------------------------------------------------------ */
   function renderProjects() {
@@ -981,6 +1129,32 @@
         });
       });
     }
+  }
+
+  /* ------------------------------------------------------------------
+   * 八.五、渲染我的笔记
+   * ------------------------------------------------------------------ */
+  function renderNotes() {
+    const notes = SITE_CONFIG.notes || { items: [] };
+    const grid = $("notes-grid");
+    if (!grid) return;
+
+    grid.innerHTML = (notes.items || [])
+      .map((note) => {
+        const hasLink = note.link && note.link !== "#";
+        return (
+          '<article class="note-card glass-card reveal">' +
+          '  <div class="note-top">' +
+          '    <span class="note-category">' + escapeHtml(note.category || "笔记") + "</span>" +
+          '    <span class="note-date">' + escapeHtml(note.date || "") + "</span>" +
+          "  </div>" +
+          '  <h3 class="note-title">' + escapeHtml(note.title) + "</h3>" +
+          '  <p class="note-summary">' + escapeHtml(note.summary || "") + "</p>" +
+          (hasLink ? '<div class="project-actions"><a class="link-btn" href="' + escapeHtml(note.link) + '" target="_blank" rel="noopener">📖 阅读笔记</a></div>' : "") +
+          "</article>"
+        );
+      })
+      .join("");
   }
 
   /* ------------------------------------------------------------------
@@ -1155,6 +1329,37 @@
     // 1. 主题切换按钮
     $("theme-toggle").addEventListener("click", toggleTheme);
 
+    // 1.5 左侧银河目录：展开 / 收起
+    const tocToggle = $("toc-toggle");
+    const tocPanel = $("toc-panel");
+    const tocClose = $("toc-close");
+
+    function setTocOpen(open) {
+      tocPanel.classList.toggle("open", open);
+      tocToggle.classList.toggle("open", open);
+      tocToggle.setAttribute("aria-expanded", open ? "true" : "false");
+    }
+
+    tocToggle.addEventListener("click", () => {
+      setTocOpen(!tocPanel.classList.contains("open"));
+    });
+
+    tocClose.addEventListener("click", () => setTocOpen(false));
+
+    // 点击目录里的版块链接后：跳转并收起面板（移动端不挡内容）
+    tocPanel.querySelectorAll(".toc-link").forEach((link) => {
+      link.addEventListener("click", () => setTocOpen(false));
+    });
+
+    // 银河天体按钮：点击后跳转到对应版块
+    tocPanel.querySelectorAll(".celestial-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const target = document.getElementById(btn.dataset.target);
+        if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+        setTocOpen(false);
+      });
+    });
+
     // 2. 汉堡菜单开关
     const hamburger = $("hamburger");
     const mobileMenu = $("mobile-menu");
@@ -1186,8 +1391,8 @@
 
     backTop.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
 
-    // 4. 当前版块高亮（滚动到哪个 section，导航对应项就亮起）
-    const navLinks = document.querySelectorAll("#nav-links a, #mobile-menu a");
+    // 4. 当前版块高亮（滚动到哪个 section，顶部导航和左侧银河目录对应项都亮起）
+    const allNavItems = document.querySelectorAll("[data-nav-id]");
     const sections = [];
     (SITE_CONFIG.nav.links || []).forEach((link) => {
       const section = document.getElementById(link.id);
@@ -1200,8 +1405,8 @@
           entries.forEach((entry) => {
             if (entry.isIntersecting) {
               const id = entry.target.id;
-              navLinks.forEach((link) => {
-                link.classList.toggle("active", link.getAttribute("href") === "#" + id);
+              allNavItems.forEach((item) => {
+                item.classList.toggle("active", item.dataset.navId === id);
               });
             }
           });

@@ -1,13 +1,14 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-theme="light">
+<html lang="zh-CN" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <!-- 网站标题与简介：由 js/config.js 自动写入（请在 config.js 中修改） -->
-  <title>你的姓名 | 个人学术主页</title>
-  <meta name="description" content="你的姓名，电子信息工程专业本科生。这里是个人学术主页。" />
-  <meta name="author" content="你的姓名" />
-  <meta name="theme-color" content="#29b6f6" />
+  <title>温景淇 | 个人学术主页</title>
+  <meta name="description" content="温景淇，电子信息工程专业本科生。这里是个人学术主页。" />
+  <meta name="author" content="温景淇" />
+  <!-- 初始即为深色星空主题，避免刷新时闪一下亮色 -->
+  <meta name="theme-color" content="#081426" />
   <!-- 网站图标：由 js/config.js 自动写入 -->
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
   <!-- 全站样式 -->
@@ -16,7 +17,7 @@
 <body>
   <!-- 无脚本提示：如果用户浏览器禁用了 JavaScript，则显示下面的提示 -->
   <noscript>
-    <div style="position:fixed;inset:0;z-index:9999;background:#f5faff;color:#102a43;display:flex;align-items:center;justify-content:center;text-align:center;padding:20px;">
+    <div style="position:fixed;inset:0;z-index:9999;background:#081426;color:#e6f4ff;display:flex;align-items:center;justify-content:center;text-align:center;padding:20px;">
       本网站需要开启 JavaScript 才能显示完整内容，请开启后刷新页面。
     </div>
   </noscript>
@@ -29,11 +30,17 @@
       <!-- 左侧品牌区：内容（头像+姓名）由 config.js 渲染 -->
       <a class="brand" href="#home" id="nav-brand" aria-label="返回首页"></a>
 
-      <!-- 桌面端导航链接：由 config.js 渲染 -->
+      <!-- 桌面端导航链接：由 config.js 渲染（只显示 bar:true 的条目） -->
       <nav class="nav-links" id="nav-links" aria-label="主导航"></nav>
 
       <!-- 右侧操作按钮 -->
       <div class="nav-actions">
+        <!-- 主题切换指路牌：放在按钮左边，箭头指向切换按钮 -->
+        <span class="theme-sign" aria-hidden="true">
+          <span class="theme-sign-arrow">➜</span>
+          <span class="theme-sign-text">点击切换明暗</span>
+        </span>
+
         <!-- 明暗主题切换按钮（图标由 main.js 根据当前主题切换） -->
         <button class="icon-btn" id="theme-toggle" type="button" aria-label="切换明暗主题" title="切换明暗主题">
           <svg id="theme-icon-sun" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
@@ -56,10 +63,34 @@
     <nav class="mobile-menu" id="mobile-menu" aria-label="移动端导航"></nav>
   </header>
 
+  <!-- ================================================================
+       左侧“银河目录”跳转栏：固定悬浮按钮 + 可展开面板
+       任何时候都能一键跳转到任何版块，结尾带银河天体导航
+       ================================================================ -->
+  <button class="toc-toggle" id="toc-toggle" type="button" aria-label="打开银河目录" aria-expanded="false">
+    <span class="toc-toggle-icon">🪐</span>
+    <span class="toc-toggle-dot"></span>
+  </button>
+
+  <aside class="toc-panel" id="toc-panel" aria-label="页面跳转目录">
+    <div class="toc-head">
+      <div class="toc-head-text">
+        <strong id="toc-title">银河目录</strong>
+        <small id="toc-subtitle">随时跳转到任何版块</small>
+      </div>
+      <button class="toc-close" id="toc-close" type="button" aria-label="关闭银河目录">×</button>
+    </div>
+    <!-- 各版块跳转按钮：由 config.js 渲染 -->
+    <nav class="toc-links" id="toc-links" aria-label="版块目录"></nav>
+    <!-- 银河天体导航：金星/火星/木星/土星/人造卫星/狮子座等 -->
+    <div class="toc-celestial-title" id="toc-celestial-title">🌌 银河天体导航</div>
+    <div class="toc-celestial" id="toc-celestial"></div>
+  </aside>
+
   <main>
     <!-- ================================================================
          首屏 Hero：左侧自我介绍 + 右侧贪吃蛇装饰
-         背景：天空蓝柔和星点（three-bg.js 绘制，CDN 失败会自动降级）
+         背景：夜空星光（three-bg.js 绘制，星星会跟随鼠标/地球光标移动）
          ================================================================ -->
     <section class="hero" id="home">
       <!-- 粒子背景容器：canvas 由 three-bg.js 自动创建并塞进来 -->
@@ -74,6 +105,9 @@
         <div class="light-dust" style="--x:78%;--y:26%;"></div>
         <div class="light-dust" style="--x:64%;--y:76%;"></div>
         <div class="light-dust" style="--x:22%;--y:72%;"></div>
+        <!-- 流星：不定时划过夜空 -->
+        <span class="shooting-star shooting-1"></span>
+        <span class="shooting-star shooting-2"></span>
       </div>
 
       <div class="container hero-inner">
@@ -92,13 +126,11 @@
     </section>
 
     <!-- ================================================================
-         关于我：个人简介 + 基本信息 + 教育经历时间线
+         关于我：个人简介 + 基本信息
          ================================================================ -->
     <section class="section" id="about">
       <div class="container">
-        <!-- 模块通用标题：由 main.js 统一生成 -->
         <div class="section-head" data-head="about"></div>
-        <!-- 正文内容：由 config.js 渲染 -->
         <div class="about-body" id="about-body"></div>
       </div>
     </section>
@@ -114,7 +146,7 @@
     </section>
 
     <!-- ================================================================
-         科研经历：竖向时间线
+         项目经历：竖向时间线
          ================================================================ -->
     <section class="section" id="research">
       <div class="container">
@@ -124,15 +156,33 @@
     </section>
 
     <!-- ================================================================
-         项目展示：分类筛选 + 项目卡片网格
+         参加比赛及获奖情况：获奖卡片网格
          ================================================================ -->
-    <section class="section section-alt" id="projects">
+    <section class="section section-alt" id="awards">
+      <div class="container">
+        <div class="section-head" data-head="awards"></div>
+        <div class="awards-grid" id="awards-grid"></div>
+      </div>
+    </section>
+
+    <!-- ================================================================
+         项目成果展示及资料：分类筛选 + 项目卡片网格
+         ================================================================ -->
+    <section class="section" id="projects">
       <div class="container">
         <div class="section-head" data-head="projects"></div>
-        <!-- 筛选按钮组：由 config.js 渲染 -->
         <div class="filter-bar" id="project-filters" role="tablist" aria-label="项目分类筛选"></div>
-        <!-- 项目卡片网格：由 config.js 渲染 -->
         <div class="project-grid" id="project-grid"></div>
+      </div>
+    </section>
+
+    <!-- ================================================================
+         我的笔记：笔记卡片
+         ================================================================ -->
+    <section class="section section-alt" id="notes">
+      <div class="container">
+        <div class="section-head" data-head="notes"></div>
+        <div class="notes-grid" id="notes-grid"></div>
       </div>
     </section>
 
@@ -162,7 +212,6 @@
        ================================================================ -->
   <footer class="footer">
     <div class="container footer-inner">
-      <!-- 不蒜子访问量统计：脚本加载成功后会自动填充数字 -->
       <div class="site-stats">
         <span id="busuanzi_container_site_pv" style="display:none;">
           本站总访问量 <span id="busuanzi_value_site_pv">0</span> 次
@@ -174,7 +223,6 @@
         <span id="stat-fallback" style="display:none;">访问统计加载中…</span>
       </div>
 
-      <!-- 版权与备案信息：由 config.js 渲染 -->
       <p class="copyright" id="footer-copyright"></p>
       <p class="icp" id="footer-icp"></p>
     </div>
@@ -201,10 +249,20 @@
   <button class="back-top" id="back-top" type="button" aria-label="回到顶部">↑</button>
 
   <!-- ================================================================
+       地球鼠标：进入网站后替换默认鼠标，地球会持续自转，
+       星空的视角会跟随这颗“地球”的移动而变化（触屏设备自动隐藏）
+       ================================================================ -->
+  <div class="earth-cursor" id="earth-cursor" aria-hidden="true">
+    <span class="earth-cursor-spin">🌍</span>
+    <span class="earth-cursor-orbit"></span>
+    <span class="earth-cursor-glow"></span>
+  </div>
+
+  <!-- ================================================================
        脚本加载顺序（重要，不要改变顺序）：
        1. Three.js CDN：为粒子背景提供 3D 能力（加载失败会自动降级为 2D 星空）
        2. config.js：全站内容配置
-       3. three-bg.js：天空柔和星点背景
+       3. three-bg.js：夜空星光背景（鼠标追踪）
        4. main.js：页面渲染与全部交互逻辑
        ================================================================ -->
   <script defer src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
