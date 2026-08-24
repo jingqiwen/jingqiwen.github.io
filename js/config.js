@@ -5,8 +5,7 @@
  *  1. 你只需要修改本文件里的“占位符文字”和“占位链接”，
  *     全站内容都会自动更新。
  *  2. 所有需要你修改的地方都用中文注释标注了 【必改】或【可选】。
- *  3. 修改时请保持英文双引号 "" 和逗号 , 不要删错，否则页面可能报错。
- *  4. 图片请放到 assets 文件夹中，然后把下方对应路径改成你的文件名。
+ *  3. 未填写的内容统一用“（这个人很懒，暂未拓展代码）”代替。
  * =====================================================================
  */
 const SITE_CONFIG = {
@@ -32,9 +31,7 @@ const SITE_CONFIG = {
   nav: {
     brand: "温景淇",
 
-    // 银河目录顺序 = 页面版块顺序（也用于顶部导航与滚动高亮）：
-    //   icon = 行星/天体图标，作为目录跳转按钮的前缀
-    //   bar  = true 显示在顶部导航栏；false 只显示在左侧银河目录
+    // 银河目录顺序 = 页面版块顺序（天体图标是每个目录项的前缀）
     links: [
       { id: "home",     text: "首页",               icon: "🟡", bar: true },   // 金星
       { id: "about",    text: "关于我",             icon: "♌",  bar: true },   // 狮子座
@@ -48,7 +45,6 @@ const SITE_CONFIG = {
     ]
   },
 
-  // 【可选】左侧银河目录面板设置（天体图标已直接放在每个目录项前面）
   toc: {
     enabled: true,
     panelTitle: "银河目录",
@@ -59,6 +55,10 @@ const SITE_CONFIG = {
    * 三、首屏 Hero（打开网站看到的第一屏）
    * ------------------------------------------------------------------ */
   hero: {
+    // 【必改】姓名上方的大欢迎语
+    welcome: "欢迎来到我的自制个人主页",
+
+    // 【必改】欢迎语下方的问候
     greeting: "你好，我是",
 
     name: "温景淇",
@@ -67,15 +67,15 @@ const SITE_CONFIG = {
 
     description: "热爱嵌入式系统与人工智能，专注于硬件与软件结合的电子信息工程方向。仰望星空，也脚踏实地。",
 
-    // 【可选】姓名下方的小徽章（学校信息已按要求暂时去掉）
+    // 【可选】是否在首页显示实时日期与时间
+    showClock: true,
+
     badges: [
       { icon: "🎓", text: "电子信息工程 · 本科生" },
-      { icon: "📍", text: "中国 · 你的城市" },
-      { icon: "🌌", text: "科技 / 星空爱好者" }
+      { icon: "📍", text: "中国 · 山西临汾" },
+      { icon: "🌌", text: "科技 / 技术 / 星空爱好者" }
     ],
 
-    // 首屏只保留一个向下探索按钮，避免跳过内容；
-    // 完整版块请使用左侧“银河目录”
     buttons: [
       { text: "向下探索", href: "#about", type: "ghost" }
     ],
@@ -83,21 +83,38 @@ const SITE_CONFIG = {
     socials: [
       { type: "github", label: "GitHub", url: "https://github.com/jingqiwen" },
       { type: "bilibili", label: "哔哩哔哩", url: "https://space.bilibili.com/你的UID" },
-      { type: "email", label: "邮箱", url: "mailto:你的邮箱@example.com" },
+      { type: "email", label: "邮箱", url: "mailto:2175414607@qq.com" },
       { type: "qq", label: "QQ", url: "tencent://message/?uin=你的QQ号" }
     ]
   },
 
   /* ------------------------------------------------------------------
-   * 四、首屏右侧的贪吃蛇装饰模块
+   * 四、首屏右侧的贪吃蛇游戏机（半裸 PCB 游戏机 + 科技蛇）
    * ------------------------------------------------------------------ */
   snake: {
     enabled: true,
-    title: "贪吃蛇 · 小憩一下",
-    subtitle: "它会自己游动，点击方向按钮、按键盘或滑动即可接管",
-    autoPlay: true,
-    speed: 150,
-    gridSize: 17
+    title: "基于Python和一些组件与插件的制作的贪吃蛇小游戏",
+    subtitle: "自动模式AI自动操纵，切换成手动模式即可游玩",
+    tip: "可切换成手动游玩",
+
+    autoPlay: true,          // 打开网页后 AI 自动游玩
+    initialSpeed: 210,       // 起步速度（毫秒/步）：故意调慢一点，吃 51 芯片会加速
+    gridSize: 17,
+
+    // 蛇身编号：每死一次 +1，显示为“温景淇001号 / 温景淇002号 ……”
+    serialName: "温景淇",
+
+    // Steam 风格的死亡成就：死亡次数达到 times 时自动弹出
+    achievements: [
+      { times: 1,   name: "初次报废",   quote: "失败乃成功之母，一次失败不代表什么。" },
+      { times: 2,   name: "再接再厉",   quote: "第二次倒下也没关系，站起来继续写代码。" },
+      { times: 3,   name: "三连击",     quote: "事不过三，但失败可以再来三次。" },
+      { times: 4,   name: "越挫越勇",   quote: "每一次短路，都是为下一次通电蓄力。" },
+      { times: 5,   name: "百炼成钢",   quote: "五次报废，恭喜你比昨天更懂调试。" },
+      { times: 8,   name: "电路老手",   quote: "八次失败，你已经把坑踩成了路。" },
+      { times: 10,  name: "十全十美",   quote: "十次重启，系统已经记住你的倔强。" },
+      { times: 100, name: "不死传说",   quote: "一百次报废之后，你就是这条蛇本身。" }
+    ]
   },
 
   /* ------------------------------------------------------------------
@@ -109,21 +126,19 @@ const SITE_CONFIG = {
 
     intro: [
       "你好，我是温景淇，就读于电子信息工程专业，主要学习电路分析、信号与系统、数字信号处理、嵌入式系统等课程。",
-      "我喜欢画画、热爱摄影（精通），还练习过播音主持。课余时间喜欢把课堂知识变成看得见、摸得着的作品，也喜欢折腾各种开发板。"
+      "我喜欢画画、热爱摄影，还练习过播音主持。课余时间喜欢把课堂知识变成看得见、摸得着的作品，也喜欢折腾各种开发板。"
     ],
 
-    // 【必改】基本信息卡片（学校信息已暂时去掉，需要时可添加）
     infoItems: [
       { label: "姓名", value: "温景淇" },
       { label: "专业", value: "电子信息工程" },
       { label: "学历", value: "本科" },
-      { label: "兴趣爱好", value: "画画 / 摄影（精通）/ 播音主持" },
-      { label: "邮箱", value: "你的邮箱@example.com" },
-      { label: "所在地", value: "中国 · 你的城市" }
+      { label: "兴趣爱好", value: "画画 / 摄影 / 播音主持" },
+      { label: "邮箱", value: "2175414607@qq.com" },
+      { label: "所在地", value: "中国 · 山西临汾" }
     ]
   },
 
-  // 教育经历（学校信息暂时去掉，items 留空则不显示；确定学校后按模板填回）
   education: {
     title: "教育经历",
     items: []
@@ -146,60 +161,49 @@ const SITE_CONFIG = {
     title: "掌握技能",
     subtitle: "一行一个技能 · 熟练度越高进度条越长",
 
-    // 【必改】技能列表：
-    //   name  = 技能名称
-    //   level = 熟练度百分比 0~100（会显示在进度条右侧）
-    //   note  = 熟练度文字说明（精通 / 掌握 / 尝试过 / 略掌握等）
     // 熟练度参考：精通 70-80%，精通+ 82-88%，精通++ 90-100%，
     //             掌握 50-65%，掌握+ 65-70%，尝试过 30-50%
+    // 核心技能保持较高熟练度，次要技能适当调低，保留真实“缺点”
     items: [
-      { name: "C语言 / C++",            level: 78, note: "精通" },
-      { name: "51单片机",                level: 58, note: "掌握" },
+      { name: "C语言 / C++",            level: 80, note: "精通" },
       { name: "STM32",                   level: 80, note: "精通" },
-      { name: "Python",                  level: 68, note: "掌握+" },
-      { name: "Origin",                  level: 38, note: "尝试过" },
-      { name: "Adobe Illustrator 2025",  level: 42, note: "略掌握" },
       { name: "嘉立创EDA",               level: 88, note: "精通+" },
       { name: "PCB板子设计",             level: 87, note: "精通+" },
-      { name: "MATLAB",                  level: 62, note: "掌握" },
-      { name: "stc-isp",                 level: 58, note: "掌握" },
-      { name: "Proteus",                 level: 68, note: "掌握+（快精通）" },
-      { name: "LaTeX",                   level: 60, note: "掌握" },
-      { name: "SolidWorks",              level: 66, note: "掌握+" },
-      { name: "WPS",                     level: 95, note: "精通++" },
-      { name: "PS",                      level: 72, note: "精通-" },
-      { name: "Pr",                      level: 40, note: "尝试过" },
-      { name: "Lr",                      level: 40, note: "尝试过" },
-      { name: "视频剪辑软件",            level: 86, note: "精通+" },
-      { name: "GitHub",                  level: 68, note: "掌握+" },
       { name: "Keil5",                   level: 88, note: "精通+" },
-      { name: "Xmind",                   level: 72, note: "精通-" },
-      { name: "Arduino / ESP32",         level: 72, note: "精通-" }
+      { name: "视频剪辑软件",            level: 70, note: "掌握+" },
+      { name: "Arduino / ESP32",         level: 72, note: "精通-" },
+      { name: "Python",                  level: 62, note: "掌握" },
+      { name: "51单片机",                level: 55, note: "掌握" },
+      { name: "MATLAB",                  level: 55, note: "掌握" },
+      { name: "stc-isp",                 level: 50, note: "掌握" },
+      { name: "Proteus",                 level: 62, note: "掌握" },
+      { name: "LaTeX",                   level: 55, note: "掌握" },
+      { name: "SolidWorks",              level: 60, note: "掌握" },
+      { name: "WPS",                     level: 82, note: "掌握+" },
+      { name: "PS",                      level: 65, note: "掌握" },
+      { name: "GitHub",                  level: 60, note: "掌握" },
+      { name: "Xmind",                   level: 58, note: "掌握" },
+      { name: "Pr",                      level: 32, note: "尝试过" },
+      { name: "Lr",                      level: 32, note: "尝试过" },
+      { name: "Origin",                  level: 30, note: "尝试过" },
+      { name: "Adobe Illustrator 2025",  level: 35, note: "略掌握" }
     ]
   },
 
   /* ------------------------------------------------------------------
-   * 七、学习经历模块（原项目经历，时间线形式）
+   * 七、学习经历模块
    * ------------------------------------------------------------------ */
   research: {
     title: "学习经历",
     subtitle: "学习与实践的足迹",
 
-    // 【必改】学习经历列表，可整段复制添加更多条目
     items: [
       {
-        time: "2024.03 - 至今",
-        name: "学习经历名称占位（例如：加入XX实验室学习）",
-        role: "学习方向/角色（占位）",
-        desc: "这里写学习内容简介，例如：在实验室系统学习STM32嵌入式开发与机器视觉，参与XX训练。",
-        tags: ["嵌入式", "机器视觉", "占位标签"]
-      },
-      {
-        time: "2023.09 - 2024.02",
-        name: "第二个学习经历名称占位",
-        role: "学习方向/角色（占位）",
-        desc: "这里写学习内容简介，例如：系统学习信号与系统、数字信号处理课程并完成课程设计。",
-        tags: ["信号处理", "占位标签"]
+        time: "（这个人很懒，暂未拓展代码）",
+        name: "（这个人很懒，暂未拓展代码）",
+        role: "（这个人很懒，暂未拓展代码）",
+        desc: "（这个人很懒，暂未拓展代码）",
+        tags: ["待拓展"]
       }
     ]
   },
@@ -215,46 +219,19 @@ const SITE_CONFIG = {
 
     items: [
       {
-        title: "项目一名称占位（例如：智能循迹小车）",
+        title: "（这个人很懒，暂未拓展代码）",
         category: "嵌入式",
-        summary: "项目一句话简介占位，例如：基于STM32与红外传感器的智能循迹小车，支持蓝牙遥控与自动避障。",
+        summary: "（这个人很懒，暂未拓展代码）",
         cover: "assets/project-cover.svg",
-        tags: ["STM32", "C语言", "传感器"],
-        github: "https://github.com/jingqiwen/项目一仓库名",
-        demo: ""
-      },
-      {
-        title: "项目二名称占位（例如：个人学术主页）",
-        category: "软件",
-        summary: "项目一句话简介占位，例如：科技风个人学术主页，包含全站星空粒子背景、贪吃蛇小游戏与响应式布局。",
-        cover: "assets/project-cover.svg",
-        tags: ["HTML", "CSS", "JavaScript"],
-        github: "https://github.com/jingqiwen/jingqiwen.github.io",
-        demo: "https://jingqiwen.github.io/"
-      },
-      {
-        title: "项目三名称占位（例如：图像分类小应用）",
-        category: "人工智能",
-        summary: "项目一句话简介占位，例如：基于Python与轻量级卷积神经网络的垃圾分类图像识别应用。",
-        cover: "assets/project-cover.svg",
-        tags: ["Python", "PyTorch", "CNN"],
-        github: "https://github.com/jingqiwen/项目三仓库名",
-        demo: ""
-      },
-      {
-        title: "项目四名称占位（例如：数字时钟设计）",
-        category: "其他",
-        summary: "项目一句话简介占位，例如：基于FPGA与数码管的数字电子钟，支持整点报时与手动校时。",
-        cover: "assets/project-cover.svg",
-        tags: ["FPGA", "Verilog"],
-        github: "https://github.com/jingqiwen/项目四仓库名",
+        tags: ["待拓展"],
+        github: "#",
         demo: ""
       }
     ]
   },
 
   /* ------------------------------------------------------------------
-   * 九、参加比赛及获奖情况模块（位于项目成果展示之后）
+   * 九、参加比赛及获奖情况模块
    * ------------------------------------------------------------------ */
   awards: {
     title: "参加比赛及获奖情况",
@@ -262,18 +239,11 @@ const SITE_CONFIG = {
 
     items: [
       {
-        time: "2024.08",
-        name: "比赛/奖项名称占位（例如：全国大学生电子设计竞赛）",
-        level: "国家级（占位）",
-        desc: "这里写比赛内容或获奖说明，例如：完成XX赛题，负责硬件与算法部分，获得XX奖（占位）。",
-        tags: ["电赛", "占位标签"]
-      },
-      {
-        time: "2023.11",
-        name: "第二个比赛/奖项名称占位",
-        level: "校级（占位）",
-        desc: "这里写比赛内容或获奖说明。",
-        tags: ["占位标签"]
+        time: "（这个人很懒，暂未拓展代码）",
+        name: "（这个人很懒，暂未拓展代码）",
+        level: "（这个人很懒，暂未拓展代码）",
+        desc: "（这个人很懒，暂未拓展代码）",
+        tags: ["待拓展"]
       }
     ]
   },
@@ -287,41 +257,26 @@ const SITE_CONFIG = {
 
     items: [
       {
-        date: "2024.11",
-        title: "笔记标题占位（例如：STM32 定时器学习笔记）",
-        category: "嵌入式",
-        summary: "这里写笔记摘要，例如：总结STM32通用定时器的时基、PWM输出与编码器模式的使用方法。",
-        link: "#"
-      },
-      {
-        date: "2024.09",
-        title: "笔记标题占位（例如：信号与系统复习要点）",
-        category: "课程学习",
-        summary: "这里写笔记摘要，例如：傅里叶变换、拉普拉斯变换与采样定理的核心公式与解题思路。",
-        link: "#"
-      },
-      {
-        date: "2024.06",
-        title: "笔记标题占位（例如：Python 视觉入门踩坑记录）",
-        category: "软件",
-        summary: "这里写笔记摘要，例如：OpenCV 环境搭建、摄像头标定与简单颜色识别的常见问题。",
+        date: "（这个人很懒，暂未拓展代码）",
+        title: "（这个人很懒，暂未拓展代码）",
+        category: "待拓展",
+        summary: "（这个人很懒，暂未拓展代码）",
         link: "#"
       }
     ]
   },
 
   /* ------------------------------------------------------------------
-   * 十一、光影瞬间（照片墙 / 头像更多展示位）
+   * 十一、光影瞬间（照片墙）
    * ------------------------------------------------------------------ */
   gallery: {
     title: "光影瞬间",
     subtitle: "学习之外的生活记录 · 点击照片可放大查看",
 
     photos: [
-      { src: "assets/photo-1.svg", title: "照片占位 01", desc: "这里写照片说明，例如：参加电子设计竞赛现场。", date: "2024.08" },
-      { src: "assets/photo-2.svg", title: "照片占位 02", desc: "这里写照片说明，例如：和队友一起调试小车。", date: "2024.06" },
-      { src: "assets/photo-3.svg", title: "照片占位 03", desc: "这里写照片说明，例如：校园风景随手拍。", date: "2024.04" },
-      { src: "assets/photo-1.svg", title: "照片占位 04", desc: "这里写照片说明，例如：实验室日常。", date: "2023.12" }
+      { src: "assets/photo-1.svg", title: "（这个人很懒，暂未拓展代码）", desc: "（这个人很懒，暂未拓展代码）", date: "待拓展" },
+      { src: "assets/photo-2.svg", title: "（这个人很懒，暂未拓展代码）", desc: "（这个人很懒，暂未拓展代码）", date: "待拓展" },
+      { src: "assets/photo-3.svg", title: "（这个人很懒，暂未拓展代码）", desc: "（这个人很懒，暂未拓展代码）", date: "待拓展" }
     ]
   },
 
@@ -334,9 +289,9 @@ const SITE_CONFIG = {
 
     cards: [
       { type: "github", label: "GitHub", value: "jingqiwen", url: "https://github.com/jingqiwen", action: "link" },
-      { type: "bilibili", label: "哔哩哔哩", value: "你的B站UID", url: "https://space.bilibili.com/你的UID", action: "link" },
-      { type: "email", label: "邮箱", value: "你的邮箱@example.com", url: "", action: "copy" },
-      { type: "qq", label: "QQ", value: "你的QQ号", url: "", action: "copy" }
+      { type: "email", label: "邮箱", value: "2175414607@qq.com", url: "", action: "copy" },
+      { type: "qq", label: "QQ", value: "（这个人很懒，暂未拓展代码）", url: "", action: "copy" },
+      { type: "bilibili", label: "哔哩哔哩", value: "（这个人很懒，暂未拓展代码）", url: "https://space.bilibili.com/你的UID", action: "link" }
     ]
   },
 
@@ -345,7 +300,7 @@ const SITE_CONFIG = {
    * ------------------------------------------------------------------ */
   footer: {
     copyright: "温景淇",
-    icp: "",
+    icp: "（这个人很懒，暂未拓展代码）",
     statsEnabled: true
   }
 };

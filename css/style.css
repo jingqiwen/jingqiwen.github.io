@@ -855,6 +855,52 @@ body.earth-cursor-active * {
 /* --- 左侧文字区 --- */
 .hero-left { min-width: 0; }
 
+/* 首页最上方的欢迎语 */
+.hero-welcome {
+  display: block;
+  width: fit-content;
+  margin-bottom: 12px;
+  padding: 7px 18px;
+  border-radius: 999px;
+  background: var(--gradient);
+  color: #fff;
+  font-size: 0.86rem;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  box-shadow: 0 8px 24px rgba(41, 182, 246, 0.35);
+}
+
+/* 首页实时日期与时间 */
+.hero-clock {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 18px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: 0 6px 18px rgba(41, 143, 202, 0.12);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.hero-clock-date {
+  color: var(--text-secondary);
+  font-size: 0.84rem;
+  font-weight: 600;
+}
+
+.hero-clock-time {
+  color: var(--primary-strong);
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-shadow: 0 0 12px rgba(41, 182, 246, 0.45);
+}
+
 .hero-greeting {
   display: inline-block;
   padding: 6px 16px;
@@ -1009,8 +1055,8 @@ body.earth-cursor-active * {
 }
 
 .snake-card {
-  width: min(460px, 100%);
-  padding: 22px;
+  width: min(520px, 100%);
+  padding: 16px;
   border-radius: 28px;
   background:
     radial-gradient(120% 80% at 20% 0%, rgba(255, 255, 255, 0.55), transparent 55%),
@@ -1034,14 +1080,21 @@ body.earth-cursor-active * {
 }
 
 .snake-head {
+  position: relative;
+  z-index: 2;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
   margin-bottom: 10px;
+  color: #e6f4ff;
 }
 
-.snake-title { font-size: 1.05rem; font-weight: 800; }
+.snake-title {
+  font-size: 0.9rem;
+  font-weight: 800;
+  line-height: 1.45;
+}
 
 .snake-score {
   padding: 5px 14px;
@@ -1055,8 +1108,10 @@ body.earth-cursor-active * {
 }
 
 .snake-subtitle {
-  font-size: 0.82rem;
-  color: var(--text-weak);
+  position: relative;
+  z-index: 2;
+  font-size: 0.78rem;
+  color: rgba(210, 235, 250, 0.72);
   margin-bottom: 10px;
 }
 
@@ -1100,13 +1155,318 @@ body.earth-cursor-active * {
   cursor: pointer;
 }
 
+/* ============ 半裸 PCB 游戏机外观 ============ */
+.snake-console {
+  position: relative;
+  border-radius: 22px;
+  padding: 12px 12px 14px;
+  background:
+    radial-gradient(120% 90% at 20% 0%, rgba(70, 130, 180, 0.16), transparent 50%),
+    linear-gradient(150deg, #161d27 0%, #0b1016 62%, #101820 100%);
+  border: 1px solid rgba(120, 220, 255, 0.18);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.04),
+    inset 0 0 40px rgba(0, 0, 0, 0.55),
+    0 10px 30px rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+}
+
+.snake-console::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(120, 220, 255, 0.08) 1px, transparent 1px);
+  background-size: 12px 12px;
+  pointer-events: none;
+}
+
+/* 露出的绿色 PCB 电路板层 */
+.console-pcb {
+  position: absolute;
+  z-index: 0;
+  border-radius: 10px;
+  background:
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.025) 0 1px, transparent 1px 9px),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.025) 0 1px, transparent 1px 9px),
+    linear-gradient(145deg, #075e2e, #064b25 55%, #0a6d36);
+  border: 1px solid rgba(104, 255, 172, 0.28);
+  box-shadow: inset 0 0 14px rgba(0, 0, 0, 0.45), 0 0 8px rgba(46, 230, 168, 0.20);
+}
+
+.console-pcb::before,
+.console-pcb::after {
+  content: "";
+  position: absolute;
+  background: rgba(173, 255, 203, 0.35);
+}
+
+.console-pcb::before {
+  inset: 22% 0 auto 0;
+  height: 1px;
+  box-shadow: 0 8px 0 rgba(173, 255, 203, 0.22), 0 16px 0 rgba(173, 255, 203, 0.16);
+}
+
+.console-pcb::after {
+  inset: 0 24% auto auto;
+  width: 1px;
+  box-shadow: 9px 0 0 rgba(173, 255, 203, 0.20), 18px 0 0 rgba(173, 255, 203, 0.14);
+}
+
+.pcb-a { left: -8px; top: 84px; width: 22px; height: 150px; border-radius: 0 10px 10px 0; }
+.pcb-b { right: -10px; bottom: 42px; width: 190px; height: 24px; border-radius: 10px 0 0 10px; }
+
+/* 只搭了一部分的外壳（金属片） */
+.console-shell {
+  position: absolute;
+  z-index: 0;
+  background: linear-gradient(145deg, #303a48, #151c26 70%);
+  border: 1px solid rgba(160, 200, 230, 0.16);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.10), 0 4px 10px rgba(0, 0, 0, 0.45);
+}
+
+.shell-left  { left: -6px; top: -6px; width: 130px; height: 42px; border-radius: 22px 0 14px 0; }
+.shell-right { right: -6px; top: -6px; width: 44px; height: 120px; border-radius: 0 22px 0 14px; }
+
+/* 裸露芯片：黑块 + 引脚 */
+.console-chip {
+  position: absolute;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(145deg, #2a2f38, #0d1117);
+  border: 1px solid rgba(160, 200, 230, 0.22);
+  border-radius: 6px;
+  color: #bfffe2;
+  font-size: 0.55rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.5);
+}
+
+.console-chip::before,
+.console-chip::after {
+  content: "";
+  position: absolute;
+  left: -4px;
+  right: -4px;
+  height: 3px;
+  background: repeating-linear-gradient(90deg, #b9c7d4 0 2px, transparent 2px 4px);
+  opacity: 0.55;
+}
+
+.console-chip::before { top: -4px; }
+.console-chip::after  { bottom: -4px; }
+
+.console-chip-1 { left: 8px; bottom: 130px; width: 52px; height: 32px; }
+.console-chip-2 { right: 8px; top: 96px; width: 56px; height: 34px; }
+.console-chip-3 { right: 26px; bottom: 30px; width: 36px; height: 28px; }
+
+/* 螺丝 */
+.console-screw {
+  position: absolute;
+  z-index: 2;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #e8f0f5, #8795a5 60%, #3d4754);
+  box-shadow: inset 0 -1px 2px rgba(0, 0, 0, 0.6), 0 1px 2px rgba(255, 255, 255, 0.2);
+}
+
+.console-screw::after {
+  content: "";
+  position: absolute;
+  left: 2px;
+  right: 2px;
+  top: 50%;
+  height: 1px;
+  background: #2c3540;
+  box-shadow: 0 -1px 0 rgba(255, 255, 255, 0.25);
+}
+
+.screw-1 { left: 9px; top: 9px; }
+.screw-2 { right: 9px; top: 9px; }
+.screw-3 { left: 9px; bottom: 9px; }
+.screw-4 { right: 9px; bottom: 9px; }
+
+/* 裸露排线 */
+.console-ribbon {
+  position: absolute;
+  z-index: 0;
+  right: 0;
+  top: 132px;
+  width: 34px;
+  height: 42px;
+  border-radius: 0 10px 10px 0;
+  background: repeating-linear-gradient(90deg, #5a6d83 0 3px, #8aa0ba 3px 6px);
+  transform: rotate(14deg);
+  opacity: 0.75;
+}
+
+/* 电源指示灯 */
+.console-led {
+  position: absolute;
+  z-index: 2;
+  right: 20px;
+  top: 15px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #2ee6a8;
+  box-shadow: 0 0 8px #2ee6a8, 0 0 16px rgba(46, 230, 168, 0.6);
+  animation: led-blink 2.4s ease-in-out infinite;
+}
+
+@keyframes led-blink {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.25; }
+}
+
+.console-label {
+  position: absolute;
+  z-index: 1;
+  left: 14px;
+  bottom: 48px;
+  font-size: 0.56rem;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  color: rgba(190, 255, 220, 0.75);
+  text-shadow: 0 0 6px rgba(46, 230, 168, 0.4);
+}
+
+/* 屏幕边框 */
+.console-screen {
+  position: relative;
+  z-index: 2;
+  padding: 12px;
+  border-radius: 18px;
+  background: linear-gradient(150deg, #0c1420, #0a101a);
+  border: 1px solid rgba(120, 220, 255, 0.20);
+  box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.45), 0 6px 16px rgba(0, 0, 0, 0.35);
+}
+
+.screen-vent {
+  position: absolute;
+  width: 4px;
+  height: 34px;
+  border-radius: 4px;
+  background: repeating-linear-gradient(180deg, rgba(150, 200, 220, 0.35) 0 2px, transparent 2px 5px);
+  opacity: 0.4;
+}
+
+.vent-1 { left: 5px; top: 20%; }
+.vent-2 { right: 5px; top: 58%; }
+
+/* 屏幕画布：换成深色 PCB 电路屏，呼应游戏机 */
+.snake-canvas-wrap {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(46, 230, 168, 0.28);
+  background: linear-gradient(180deg, #07130d 0%, #0a1f15 100%);
+  box-shadow:
+    inset 0 0 34px rgba(0, 0, 0, 0.65),
+    inset 0 0 12px rgba(46, 230, 168, 0.10),
+    0 0 0 1px rgba(255, 255, 255, 0.04) inset;
+  touch-action: none;
+}
+
+:root[data-theme="dark"] .snake-canvas-wrap {
+  background: linear-gradient(180deg, #07130d 0%, #0a1f15 100%);
+}
+
+/* 状态栏：编号 / 护盾 / 电容 / 效果 */
+.snake-statusbar {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: 12px;
+  padding: 8px 10px;
+  border-radius: 14px;
+  background: rgba(6, 14, 22, 0.65);
+  border: 1px solid rgba(46, 230, 168, 0.20);
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: #bfffe2;
+}
+
+.status-serial {
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: rgba(46, 230, 168, 0.15);
+  border: 1px solid rgba(46, 230, 168, 0.45);
+  color: #6dffc0;
+  white-space: nowrap;
+}
+
+.status-item {
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(120, 220, 255, 0.16);
+  white-space: nowrap;
+}
+
+/* 食物皮肤图例 */
+.snake-legend {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px 9px;
+  margin-top: 10px;
+  font-size: 0.68rem;
+  color: rgba(200, 230, 220, 0.75);
+}
+
+.snake-legend .danger { color: #ff8b8b; font-weight: 800; }
+
+/* 自动模式提示 */
+.snake-auto-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.auto-hint {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #8fdcff;
+  white-space: nowrap;
+}
+
+/* 电容按钮 */
+.cap-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.cap-btn.ready {
+  background: linear-gradient(135deg, #ff8fab 0%, #ff4d6d 100%);
+  color: #fff;
+  border-color: transparent;
+  box-shadow: 0 6px 18px rgba(255, 77, 109, 0.45);
+  animation: cap-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes cap-pulse {
+  0%, 100% { box-shadow: 0 6px 18px rgba(255, 77, 109, 0.40); }
+  50%      { box-shadow: 0 8px 28px rgba(255, 77, 109, 0.75); }
+}
+
+/* ============ 贪吃蛇控制区 ============ */
 /* 贪吃蛇下方控制区 */
 .snake-controls {
+  position: relative;
+  z-index: 2;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  margin-top: 16px;
+  margin-top: 14px;
   flex-wrap: wrap;
 }
 
@@ -1179,6 +1539,22 @@ body.earth-cursor-active * {
 
 .mini-btn:hover { transform: translateY(-2px); color: var(--primary-strong); border-color: var(--border-strong); box-shadow: 0 6px 16px rgba(41, 182, 246, 0.25); }
 .mini-btn.active { background: var(--gradient); color: #fff; border-color: transparent; box-shadow: 0 6px 18px rgba(41, 182, 246, 0.40); }
+
+/* 游戏机内部的控制按钮统一使用深色 PCB 风格 */
+.snake-console .dpad button,
+.snake-console .mini-btn {
+  background: linear-gradient(145deg, #172230, #0d1520);
+  border-color: rgba(120, 220, 255, 0.18);
+  color: #cfeaff;
+}
+
+.snake-console .dpad button:hover,
+.snake-console .mini-btn:hover {
+  color: #7fe0ff;
+  border-color: rgba(127, 224, 255, 0.55);
+}
+
+.snake-console .dpad .center { background: var(--gradient); color: #fff; }
 
 /* 首屏向下滚动提示 */
 .scroll-hint {
@@ -1924,6 +2300,65 @@ body.earth-cursor-active * {
 /* ---------------------------------------------------------------------
  * 十四、轻提示气泡与回到顶部按钮
  * --------------------------------------------------------------------- */
+/* Steam 风格成就弹出区 */
+.achievement-box {
+  position: fixed;
+  right: 18px;
+  top: 82px;
+  z-index: 340;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none;
+}
+
+.achievement-pop {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: min(330px, calc(100vw - 36px));
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(12, 32, 52, 0.96), rgba(10, 22, 38, 0.96));
+  border: 1px solid rgba(127, 224, 255, 0.45);
+  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.45), 0 0 24px rgba(41, 182, 246, 0.25);
+  color: #e6f4ff;
+  opacity: 0;
+  transform: translateX(120%);
+  transition: opacity 0.35s, transform 0.45s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+}
+
+.achievement-pop.show {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.achievement-icon {
+  width: 46px;
+  height: 46px;
+  flex: 0 0 46px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  background: var(--gradient);
+  box-shadow: 0 0 18px rgba(41, 182, 246, 0.55);
+}
+
+.achievement-text strong {
+  display: block;
+  font-size: 0.92rem;
+  color: #7fe0ff;
+}
+
+.achievement-text p {
+  margin-top: 3px;
+  font-size: 0.78rem;
+  color: #b5cbe0;
+  line-height: 1.45;
+}
+
 .toast {
   position: fixed;
   left: 50%;
@@ -2116,6 +2551,7 @@ body.earth-cursor-active * {
   .hero { padding-top: 120px; }
   .hero-inner { grid-template-columns: 1fr; gap: 40px; }
   .hero-left { text-align: center; }
+  .hero-welcome { margin-left: auto; margin-right: auto; }
   .hero-desc { margin-left: auto; margin-right: auto; }
   .hero-badges, .hero-buttons, .hero-socials { justify-content: center; }
   .hero-right { order: 2; }
@@ -2172,6 +2608,9 @@ body.earth-cursor-active * {
   .lightbox { padding: 6vh 14px; }
   .lightbox-prev { left: 8px; }
   .lightbox-next { right: 8px; }
+
+  /* 成就弹出框移到顶部中央附近 */
+  .achievement-box { right: 10px; top: 70px; }
 }
 
 @media (max-width: 520px) {
@@ -2188,8 +2627,12 @@ body.earth-cursor-active * {
   .info-list { grid-template-columns: 1fr; }
   .about-info-card, .about-intro-card, .edu-card { padding: 22px 20px; }
 
-  .snake-card { padding: 14px; }
+  .snake-card { padding: 10px; }
+  .snake-console { padding: 10px 9px 12px; }
   .snake-controls { justify-content: center; }
+  .snake-auto-wrap { width: 100%; justify-content: center; }
+  .console-chip-2 { top: 84px; }
+  .console-label { display: none; }
 
   .gallery-grid { grid-template-columns: 1fr; }
   .contact-grid { grid-template-columns: 1fr; }

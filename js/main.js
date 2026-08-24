@@ -328,16 +328,21 @@
       .join("");
 
     left.innerHTML =
+      '<div class="hero-welcome">' + escapeHtml(hero.welcome || "欢迎来到我的自制个人主页") + "</div>" +
       '<span class="hero-greeting">' + escapeHtml(hero.greeting || "你好，我是") + "</span>" +
       '<h1 class="hero-name">' + escapeHtml(hero.name || "你的姓名") + "</h1>" +
       '<div class="hero-role"><span class="typed-text"></span><span class="typed-cursor"></span></div>' +
       '<p class="hero-desc">' + escapeHtml(hero.description || "") + "</p>" +
       '<div class="hero-badges">' + badges + "</div>" +
+      (hero.showClock !== false ? '<div class="hero-clock" id="hero-clock" aria-live="polite"></div>' : "") +
       '<div class="hero-buttons">' + buttons + "</div>" +
       '<div class="hero-socials">' + socials + "</div>";
 
     // 身份文字打字机动画
     startTyping($("hero-left").querySelector(".typed-text"), hero.role || "");
+
+    // 首页实时日期与时间（每秒刷新）
+    if (hero.showClock !== false) startHeroClock();
 
     // 贪吃蛇模块
     if (SITE_CONFIG.snake && SITE_CONFIG.snake.enabled !== false) {
@@ -346,6 +351,27 @@
       const right = $("hero-right");
       if (right) right.innerHTML = "";
     }
+  }
+
+  // 首页实时日期与时间：每秒更新一次
+  function startHeroClock() {
+    const el = $("hero-clock");
+    if (!el) return;
+
+    const WEEK = ["日", "一", "二", "三", "四", "五", "六"];
+    function pad(n) { return String(n).padStart(2, "0"); }
+    function tick() {
+      const now = new Date();
+      el.innerHTML =
+        '<span class="hero-clock-date">' +
+        now.getFullYear() + " 年 " + (now.getMonth() + 1) + " 月 " + now.getDate() + " 日 · 星期" + WEEK[now.getDay()] +
+        "</span>" +
+        '<span class="hero-clock-time">' +
+        pad(now.getHours()) + ":" + pad(now.getMinutes()) + ":" + pad(now.getSeconds()) +
+        "</span>";
+    }
+    tick();
+    setInterval(tick, 1000);
   }
 
   // 打字机动画：一个字一个字显示，结束后重新开始循环
@@ -374,38 +400,110 @@
   }
 
   /* ==================================================================
-   * 贪吃蛇小游戏（首屏右侧装饰模块）
-   *  - 默认“自动游动”模式：AI 自动找食物，像动态装饰一样；
-   *  - 用户按方向键 / WASD / 屏幕滑动 / 方向按钮即可接管手动控制；
-   *  - 自动模式永远不会卡死，撞墙会自动重新开始。
+   * 贪吃蛇小游戏（首屏右侧：半裸 PCB 游戏机 + 科技蛇）
+   *  - 外壳只搭了一部分，裸露出绿色 PCB、芯片、排线和螺丝；
+   *  - 默认 AI 自动模式，可随时切换手动：点击方向按钮 / 长按 /
+   *    滑动画布 / 键盘 WASD / 空格释放电容技能；
+   *  - 食物皮肤：51芯片、32芯片、书本、代码、数据流、电容、
+   *    电阻、电感、烧坏的电路板（危险，吃到立即死亡）；
+   *  - 蛇身编号“温景淇001号”，每死一次 +1；
+   *  - 死亡后播放爆炸动画，5 秒后自动重启；
+   *  - 死亡 1/2/3/4/5/8/10/100 次会弹出 Steam 风格成就。
    * ================================================================== */
   let snake = null; // 贪吃蛇实例，供全局键盘事件使用
+
+  // 食物皮肤与权重配置：权重越大出现概率越高
+  const FOOD_DEFS = {
+    code:       { weight: 32, label: "代码",   color: "#7fe0ff", glyph: "</>" },
+    chip51:     { weight: 12, label: "51芯片", color: "#3ddc84", glyph: "51" },
+    chip32:     { weight: 10, label: "32芯片", color: "#4fc3f7", glyph: "32" },
+    book:       { weight: 10, label: "书本",   color: "#ffd166", glyph: "📘" },
+    resistor:   { weight: 9,  label: "电阻",   color: "#f4a261", glyph: "R" },
+    data:       { weight: 8,  label: "数据流", color: "#9b8cff", glyph: "≋" },
+    capacitor:  { weight: 8,  label: "电容",   color: "#ff8fab", glyph: "C" },
+    inductor:   { weight: 6,  label: "电感",   color: "#b8f25a", glyph: "L" },
+    burnt:      { weight: 5,  label: "烧坏电路板", color: "#ff4d4d", glyph: "☠" }
+  };
+
+  // 成就提示：名字 + 励志语录
+  function pushAchievement(name, quote) {
+    const box = $("achievement-box");
+    if (!box) return;
+    const pop = document.createElement("div");
+    pop.className = "achievement-pop";
+    pop.innerHTML =
+      '<div class="achievement-icon">🏆</div>' +
+      '<div class="achievement-text">' +
+      "  <strong>成就解锁：" + escapeHtml(name) + "</strong>" +
+      "  <p>" + escapeHtml(quote) + "</p>" +
+      "</div>";
+    box.appendChild(pop);
+    requestAnimationFrame(() => pop.classList.add("show"));
+    setTimeout(() => {
+      pop.classList.remove("show");
+      setTimeout(() => pop.parentNode && pop.parentNode.removeChild(pop), 350);
+    }, 4200);
+  }
 
   function renderSnakeCard() {
     const config = SITE_CONFIG.snake || {};
     const right = $("hero-right");
     if (!right) return;
 
+    // 游戏机外壳只搭一部分：绿色 PCB 露出、芯片/排线/螺丝可见
     right.innerHTML =
       '<div class="snake-card glass-card reveal">' +
-      '  <div class="snake-head">' +
-      '    <span class="snake-title">🐍 ' + escapeHtml(config.title || "贪吃蛇") + "</span>" +
-      '    <span class="snake-score" id="snake-score">得分 0</span>' +
-      "  </div>" +
-      '  <p class="snake-subtitle">' + escapeHtml(config.subtitle || "") + "</p>" +
-      '  <p class="snake-tip">🖱️ 点击下方方向按钮 / 长按 / 滑动画布即可控制，无需键盘</p>' +
-      '  <div class="snake-canvas-wrap" id="snake-wrap"><canvas id="snake-canvas" aria-label="贪吃蛇小游戏画布"></canvas></div>' +
-      '  <div class="snake-controls">' +
-      '    <div class="dpad" aria-label="方向控制">' +
-      '      <button type="button" class="up" data-dir="up" aria-label="向上">▲</button>' +
-      '      <button type="button" class="left" data-dir="left" aria-label="向左">◀</button>' +
-      '      <button type="button" class="center" id="snake-pause" aria-label="暂停/继续">⏸</button>' +
-      '      <button type="button" class="right" data-dir="right" aria-label="向右">▶</button>' +
-      '      <button type="button" class="down" data-dir="down" aria-label="向下">▼</button>' +
+      '  <div class="snake-console">' +
+      '    <div class="console-pcb pcb-a"></div>' +
+      '    <div class="console-pcb pcb-b"></div>' +
+      '    <div class="console-shell shell-left"></div>' +
+      '    <div class="console-shell shell-right"></div>' +
+      '    <div class="console-chip console-chip-1"><span>STM32</span></div>' +
+      '    <div class="console-chip console-chip-2"><span>AT89C51</span></div>' +
+      '    <div class="console-chip console-chip-3"><span>PY</span></div>' +
+      '    <div class="console-screw screw-1"></div>' +
+      '    <div class="console-screw screw-2"></div>' +
+      '    <div class="console-screw screw-3"></div>' +
+      '    <div class="console-screw screw-4"></div>' +
+      '    <div class="console-ribbon"></div>' +
+      '    <div class="console-led"></div>' +
+      '    <div class="console-label">WJQ-SNAKE · PCB-001</div>' +
+      '    <div class="snake-head">' +
+      '      <span class="snake-title">🐍 ' + escapeHtml(config.title || "贪吃蛇") + "</span>" +
+      '      <span class="snake-score" id="snake-score">长度 4</span>' +
       "    </div>" +
-      '    <div class="snake-actions">' +
-      '      <button type="button" class="mini-btn active" id="snake-auto">自动游动</button>' +
-      '      <button type="button" class="mini-btn" id="snake-reset">重新开始</button>' +
+      '    <p class="snake-subtitle">' + escapeHtml(config.subtitle || "") + "</p>" +
+      '    <div class="console-screen">' +
+      '      <div class="screen-vent vent-1"></div><div class="screen-vent vent-2"></div>' +
+      '      <div class="snake-canvas-wrap" id="snake-wrap"><canvas id="snake-canvas" aria-label="贪吃蛇小游戏画布"></canvas></div>' +
+      "    </div>" +
+      '    <div class="snake-statusbar">' +
+      '      <span class="status-serial" id="snake-serial">' + escapeHtml((config.serialName || "温景淇") + "001号") + "</span>" +
+      '      <span class="status-item" id="snake-shield">🛡 护盾 --</span>' +
+      '      <span class="status-item" id="snake-energy">⚡ 电容未储能</span>' +
+      '      <span class="status-item" id="snake-effect">状态正常</span>' +
+      "    </div>" +
+      '    <div class="snake-controls">' +
+      '      <div class="dpad" aria-label="方向控制">' +
+      '        <button type="button" class="up" data-dir="up" aria-label="向上">▲</button>' +
+      '        <button type="button" class="left" data-dir="left" aria-label="向左">◀</button>' +
+      '        <button type="button" class="center" id="snake-pause" aria-label="暂停/继续">⏸</button>' +
+      '        <button type="button" class="right" data-dir="right" aria-label="向右">▶</button>' +
+      '        <button type="button" class="down" data-dir="down" aria-label="向下">▼</button>' +
+      "      </div>" +
+      '      <div class="snake-actions">' +
+      '        <div class="snake-auto-wrap">' +
+      '          <button type="button" class="mini-btn active" id="snake-auto">自动游动</button>' +
+      '          <span class="auto-hint">' + escapeHtml(config.tip || "可切换成手动游玩") + "</span>" +
+      "        </div>" +
+      '        <button type="button" class="mini-btn cap-btn" id="snake-capacitor" disabled>⚡ 释放电容</button>' +
+      '        <button type="button" class="mini-btn" id="snake-reset">重新开始</button>' +
+      "      </div>" +
+      "    </div>" +
+      '    <div class="snake-legend">' +
+      '      <span>51=加速</span><span>32=+2长度</span><span>书本=+1</span><span>代码=+1</span>' +
+      '      <span>数据流=10s护盾</span><span>电容=储能爆发</span><span>电阻=减速</span>' +
+      '      <span>电感=电磁反弹</span><span class="danger">烧毁板=死亡</span>' +
       "    </div>" +
       "  </div>" +
       "</div>";
@@ -414,12 +512,15 @@
       canvas: $("snake-canvas"),
       wrap: $("snake-wrap"),
       scoreEl: $("snake-score"),
+      serialEl: $("snake-serial"),
+      shieldEl: $("snake-shield"),
+      energyEl: $("snake-energy"),
+      effectEl: $("snake-effect"),
       autoBtn: $("snake-auto"),
       resetBtn: $("snake-reset"),
       pauseBtn: $("snake-pause"),
-      gridSize: config.gridSize || 17,
-      speed: config.speed || 150,
-      autoPlay: config.autoPlay !== false
+      capacitorBtn: $("snake-capacitor"),
+      config: config
     });
     snake.init();
   }
@@ -428,40 +529,79 @@
     this.canvas = options.canvas;
     this.wrap = options.wrap;
     this.scoreEl = options.scoreEl;
+    this.serialEl = options.serialEl;
+    this.shieldEl = options.shieldEl;
+    this.energyEl = options.energyEl;
+    this.effectEl = options.effectEl;
     this.autoBtn = options.autoBtn;
     this.resetBtn = options.resetBtn;
     this.pauseBtn = options.pauseBtn;
-    this.gridSize = options.gridSize;
-    this.speed = options.speed;
-    this.autoPlay = options.autoPlay;
+    this.capacitorBtn = options.capacitorBtn;
+    this.config = options.config || {};
+
+    this.gridSize = this.config.gridSize || 17;
+    this.initialSpeed = this.config.initialSpeed || 210; // 起步故意慢一点
+    this.minSpeed = 78;   // 最快速度（吃 51 芯片逐渐逼近）
+    this.maxSpeed = 300;  // 最慢速度（吃电阻后）
+    this.speed = this.initialSpeed;
+    this.serialName = this.config.serialName || "温景淇";
+    this.autoPlay = this.config.autoPlay !== false;
     this.reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    // 游戏内部状态
-    this.snakeBody = [];   // 蛇身坐标数组 [{x, y}]
-    this.food = { x: 0, y: 0 };
-    this.dir = "right";    // 当前移动方向
-    this.nextDir = "right";// 下一次要用的方向（防止一帧内连续掉头）
+    // 游戏核心状态
+    this.snakeBody = [];
+    this.food = { x: 0, y: 0, type: "code" };
+    this.dir = "right";
+    this.nextDir = "right";
     this.score = 0;
     this.alive = true;
-    this.mode = this.autoPlay ? "auto" : "manual"; // auto = AI自动 / manual = 手动
+    this.mode = this.autoPlay ? "auto" : "manual";
     this.paused = false;
     this.visible = true;
     this.timer = 0;
+    this.holdTimer = 0;
+    this.growPending = 0;
+
+    // 元件皮肤效果
+    this.shieldUntil = 0;          // 数据流护盾截止时间（10秒）
+    this.capacitorReady = false;   // 电容是否已储能
+    this.boostUntil = 0;           // 电容爆发截止时间（3秒超速+无敌）
+    this.preBoostSpeed = 0;        // 爆发前速度，用于恢复
+    this.reboundReady = false;     // 电感：一次电磁反弹
+    this.effectText = "状态正常";
+    this.effectUntil = 0;
+
+    // 死亡 / 编号 / 成就
+    this.serial = 1;               // 温景淇001号
+    this.deathCount = 0;
+    this.deathReason = "";
+    this.deathRestartAt = 0;
+    this.deathTimer = 0;
+    this.deathDrawTimer = 0;
+    this.deathParticles = [];
+    this.deathParticleRaf = 0;
+    this.achievements = this.config.achievements || [];
+
     this.ctx = null;
     this.cell = 0;
     this.dpr = 1;
+    this.observer = null;
   }
+
+  SnakeGame.prototype.serialText = function () {
+    return this.serialName + ("000" + this.serial).slice(-3) + "号";
+  };
 
   SnakeGame.prototype.init = function () {
     const self = this;
 
-    // 画布按屏幕清晰度设置实际像素（CSS 尺寸由样式表控制）
     this.resizeCanvas();
     this.ctx = this.canvas.getContext("2d");
     this.resetGame();
     this.draw();
+    this.updateStatusBar();
 
-    // 系统要求减少动态效果时：不自动游动，只作为静态装饰（仍可手动控制）
+    // 系统减少动态效果时：不自动游动，只做静态展示
     if (this.reduceMotion) {
       this.mode = "manual";
       this.autoBtn.textContent = "手动模式";
@@ -473,7 +613,7 @@
       self.draw();
     });
 
-    // 屏幕滑动控制（移动端）：记录起点与终点判断方向
+    // 屏幕滑动控制
     this.wrap.addEventListener("touchstart", this.onTouchStart = (event) => {
       self.touchStart = event.touches[0];
     }, { passive: true });
@@ -484,33 +624,26 @@
       const dx = end.clientX - self.touchStart.clientX;
       const dy = end.clientY - self.touchStart.clientY;
       self.touchStart = null;
-      if (Math.abs(dx) < 12 && Math.abs(dy) < 12) return; // 滑动太短视为误触
+      if (Math.abs(dx) < 12 && Math.abs(dy) < 12) return;
       self.setManualMode();
-      if (Math.abs(dx) > Math.abs(dy)) {
-        self.requestDirection(dx > 0 ? "right" : "left");
-      } else {
-        self.requestDirection(dy > 0 ? "down" : "up");
-      }
+      if (Math.abs(dx) > Math.abs(dy)) self.requestDirection(dx > 0 ? "right" : "left");
+      else self.requestDirection(dy > 0 ? "down" : "up");
     }, { passive: true });
 
-    // 方向键按钮：支持单击、长按（按住会连续移动）
-    // 注意：按钮在整张蛇卡片里，不在画布 wrap 内，所以用 closest 往上找整张卡片
+    // 页面方向按钮：单击 + 长按（按钮在整张卡片里，不在画布 wrap 内）
     const cardEl = this.canvas.closest ? this.canvas.closest(".snake-card") : (this.canvas.parentElement && this.canvas.parentElement.parentElement);
     const directionBtns = cardEl ? cardEl.querySelectorAll("[data-dir]") : [];
     directionBtns.forEach((btn) => {
-      // 单击：走一步（键盘激活按钮时 click 的 detail 为 0）
       btn.addEventListener("click", (event) => {
-        if (event.detail !== 0) return; // 鼠标点击会由 pointerdown 处理，避免重复走两步
+        if (event.detail !== 0) return;
         self.setManualMode();
         self.requestDirection(btn.dataset.dir);
       });
-      // 指针按下：立即接管并开始长按连续移动
       btn.addEventListener("pointerdown", (event) => {
         event.preventDefault();
         btn.classList.add("holding");
         self.startHold(btn.dataset.dir);
       });
-      // 松开 / 移出按钮：停止长按
       ["pointerup", "pointerleave", "pointercancel"].forEach((type) => {
         btn.addEventListener(type, () => {
           btn.classList.remove("holding");
@@ -519,53 +652,56 @@
       });
     });
 
-    // 自动 / 手动切换按钮
+    // 自动 / 手动切换
     this.autoBtn.addEventListener("click", () => {
       if (self.mode === "auto") {
         self.setManualMode();
       } else {
-        if (!self.alive) self.resetGame(); // 失败状态下切自动先重开
+        if (!self.alive) self.resetGame();
         self.mode = "auto";
-        self.autoBtn.textContent = "自动游动";
-        self.autoBtn.classList.add("active");
+        self.updateModeUI();
         self.paused = false;
         self.pauseBtn.textContent = "⏸";
         self.startLoop();
       }
     });
 
-    // 重新开始按钮
+    // 释放电容：手动模式下点击按钮爆发
+    this.capacitorBtn.addEventListener("click", () => {
+      if (self.mode === "manual") self.activateCapacitor();
+    });
+
+    // 重新开始
     this.resetBtn.addEventListener("click", () => {
       self.resetGame();
       if (self.mode === "auto") self.startLoop();
       self.draw();
     });
 
-    // 暂停 / 继续（中间按钮）
+    // 暂停 / 继续
     this.pauseBtn.addEventListener("click", () => {
       self.paused = !self.paused;
       self.pauseBtn.textContent = self.paused ? "▶" : "⏸";
-      // 继续后：自动模式要重新安排计时器
       if (!self.paused && self.mode === "auto" && self.alive) self.startLoop();
     });
 
-    // 页面滚动时：蛇蛇在屏幕外就暂停计时，省电
+    // 状态栏 250ms 刷新一次：护盾倒计时、电容、当前效果
+    this.statusTimer = setInterval(() => self.updateStatusBar(), 250);
+
+    // 蛇蛇滚出屏幕时暂停计时
     if ("IntersectionObserver" in window) {
       this.observer = new IntersectionObserver((entries) => {
         self.visible = entries[0].isIntersecting;
-        self.startLoop(); // 重新安排计时器
+        self.startLoop();
       }, { threshold: 0.1 });
       this.observer.observe(this.wrap);
     }
 
-    // 主题切换后重绘（颜色跟随主题）
     window.snakeOnThemeChange = () => self.draw();
 
-    // 开启自动模式
     if (this.mode === "auto") this.startLoop();
   };
 
-  // 设置画布实际像素大小（适配高清屏）
   SnakeGame.prototype.resizeCanvas = function () {
     const size = this.wrap.clientWidth || 320;
     this.dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -574,129 +710,343 @@
     this.cell = this.canvas.width / this.gridSize;
   };
 
-  // 初始化一条居中的小蛇和第一个食物
   SnakeGame.prototype.resetGame = function () {
     const mid = Math.floor(this.gridSize / 2);
     this.snakeBody = [];
-    for (let i = 0; i < 4; i++) {
-      this.snakeBody.push({ x: mid - i, y: mid });
-    }
+    for (let i = 0; i < 4; i++) this.snakeBody.push({ x: mid - i, y: mid }); // 起始四格
     this.dir = "right";
     this.nextDir = "right";
-    this.score = 0;
+    this.score = this.snakeBody.length;
     this.alive = true;
     this.paused = false;
+    this.growPending = 0;
+    this.speed = this.initialSpeed;       // 每次重启都从“比较慢”开始
+    this.shieldUntil = 0;
+    this.capacitorReady = false;
+    this.boostUntil = 0;
+    this.reboundReady = false;
+    this.effectText = "状态正常";
+    this.deathReason = "";
+    this.deathParticles = [];
+    clearTimeout(this.deathTimer);
+    clearInterval(this.deathDrawTimer);
+    cancelAnimationFrame(this.deathParticleRaf);
+    clearTimeout(this.boostTimer);
     this.pauseBtn && (this.pauseBtn.textContent = "⏸");
     this.placeFood();
     this.updateScore();
+    this.updateModeUI();
+    this.updateStatusBar();
   };
 
-  // 在空白位置随机放食物
+  // 加权随机选择食物皮肤
+  SnakeGame.prototype.rollFoodType = function () {
+    let total = 0;
+    Object.keys(FOOD_DEFS).forEach((key) => (total += FOOD_DEFS[key].weight));
+    let roll = Math.random() * total;
+    for (const key of Object.keys(FOOD_DEFS)) {
+      roll -= FOOD_DEFS[key].weight;
+      if (roll <= 0) return key;
+    }
+    return "code";
+  };
+
   SnakeGame.prototype.placeFood = function () {
-    const free = [];
-    // 简单策略：随机尝试，直到找到不在蛇身上的格子
-    for (let tries = 0; tries < 500; tries++) {
+    const type = this.rollFoodType();
+    for (let tries = 0; tries < 600; tries++) {
       const x = Math.floor(Math.random() * this.gridSize);
       const y = Math.floor(Math.random() * this.gridSize);
       if (!this.snakeBody.some((seg) => seg.x === x && seg.y === y)) {
-        this.food = { x, y };
+        this.food = { x, y, type };
         return;
       }
     }
-    this.food = { x: 0, y: 0 };
+    this.food = { x: 0, y: 0, type };
   };
 
   SnakeGame.prototype.updateScore = function () {
-    if (this.scoreEl) this.scoreEl.textContent = "得分 " + this.score;
+    if (this.scoreEl) this.scoreEl.textContent = "长度 " + this.score;
   };
 
-  // 用户接管：把自动模式切到手动模式
+  SnakeGame.prototype.updateModeUI = function () {
+    this.autoBtn.textContent = this.mode === "auto" ? "自动游动" : "手动模式";
+    this.autoBtn.classList.toggle("active", this.mode === "auto");
+    // 电容技能只在手动模式可用
+    this.capacitorBtn.disabled = this.mode !== "manual" || !this.capacitorReady;
+    this.capacitorBtn.classList.toggle("ready", this.capacitorReady && this.mode === "manual");
+  };
+
+  SnakeGame.prototype.updateStatusBar = function () {
+    const now = Date.now();
+    if (this.serialEl) this.serialEl.textContent = this.serialText();
+
+    // 数据流护盾倒计时
+    let shieldText = "🛡 护盾 --";
+    if (now < this.shieldUntil) shieldText = "🛡 护盾 " + Math.ceil((this.shieldUntil - now) / 1000) + "s";
+    if (this.shieldEl) this.shieldEl.textContent = shieldText;
+
+    // 电容储能状态（爆发期间显示倒计时）
+    let energyText = this.capacitorReady ? "⚡ 电容已储能" : "⚡ 电容未储能";
+    if (now < this.boostUntil) energyText = "⚡ 爆发中 " + Math.ceil((this.boostUntil - now) / 1000) + "s";
+    if (this.energyEl) this.energyEl.textContent = energyText;
+
+    // 当前效果
+    if (this.effectEl) {
+      let effect = this.effectText;
+      if (now > this.effectUntil) effect = this.alive ? "状态正常" : "已报废";
+      this.effectEl.textContent = effect;
+    }
+
+    this.updateModeUI();
+  };
+
   SnakeGame.prototype.setManualMode = function () {
     if (this.mode === "auto") {
       this.mode = "manual";
-      this.autoBtn.textContent = "手动模式";
-      this.autoBtn.classList.remove("active");
       this.stopLoop();
+      this.updateModeUI();
     }
-    if (!this.alive) {
-      this.resetGame();
-    }
+    if (!this.alive) this.resetGame();
   };
 
-  // 记录用户想去的方向（禁止 180 度掉头）
+  SnakeGame.prototype.isInvincible = function () {
+    const now = Date.now();
+    return now < this.shieldUntil || now < this.boostUntil;
+  };
+
+  SnakeGame.prototype.opposite = function (dir) {
+    return { up: "down", down: "up", left: "right", right: "left" }[dir] || dir;
+  };
+
+  // 护盾/电感触发时：不死亡，反向弹回
+  SnakeGame.prototype.bounceBack = function () {
+    const back = this.opposite(this.dir);
+    this.dir = back;
+    this.nextDir = back;
+  };
+
   SnakeGame.prototype.requestDirection = function (dir) {
-    const opposite = { up: "down", down: "up", left: "right", right: "left" };
-    if (opposite[dir] === this.dir) return;
+    if (this.opposite(dir) === this.dir) return;
     this.nextDir = dir;
-    if (this.mode === "manual" && this.alive && !this.paused) {
-      this.tick(); // 手动模式：按一下走一步，反馈更快
-    }
+    if (this.mode === "manual" && this.alive && !this.paused) this.tick();
   };
 
-  // 长按页面方向按钮：接管手动模式并持续向该方向移动
   SnakeGame.prototype.startHold = function (dir) {
     const self = this;
-    this.stopHold(); // 先清除旧的长按计时
-    this.setManualMode(); // 长按会切到手动模式
-    this.requestDirection(dir); // 先走第一步，反馈立刻出现
+    this.stopHold();
+    this.setManualMode();
+    this.requestDirection(dir);
     if (!this.alive || this.paused) return;
     this.holdTimer = setInterval(() => {
-      if (!self.alive || self.paused) {
-        self.stopHold();
-        return;
-      }
+      if (!self.alive || self.paused) { self.stopHold(); return; }
       self.requestDirection(dir);
-    }, Math.max(120, this.speed)); // 速度太快容易撞墙，长按节奏略慢一些
+    }, Math.max(120, this.speed));
   };
 
-  // 停止长按按钮控制
   SnakeGame.prototype.stopHold = function () {
     clearInterval(this.holdTimer);
     this.holdTimer = 0;
   };
 
-  // 判断某格是否会撞墙或撞到自己
+  // 吃食物后的效果
+  SnakeGame.prototype.applyFoodEffect = function (type) {
+    const def = FOOD_DEFS[type] || FOOD_DEFS.code;
+    const now = Date.now();
+
+    switch (type) {
+      case "code":
+        this.growPending = 1;
+        this.setEffect("代码：蛇身长度 +1", 1800);
+        break;
+      case "book":
+        this.growPending = 1;
+        this.setEffect("书本：蛇身长度 +1", 1800);
+        break;
+      case "chip32":
+        this.growPending = 2;
+        this.setEffect("32芯片：蛇身长度 +2", 1800);
+        break;
+      case "chip51":
+        this.speed = Math.max(this.minSpeed, this.speed - 18);
+        this.setEffect("51芯片：移动速度提升！", 2200);
+        this.startLoop();
+        break;
+      case "resistor":
+        this.speed = Math.min(this.maxSpeed, this.speed + 26);
+        this.setEffect("电阻：移动速度减慢了…", 2200);
+        this.startLoop();
+        break;
+      case "data":
+        this.shieldUntil = now + 10000;
+        this.setEffect("数据流护盾：10 秒内免疫伤害", 3000);
+        break;
+      case "capacitor":
+        this.capacitorReady = true;
+        this.setEffect("电容已储能：手动模式按空格或点 ⚡ 释放", 2600);
+        break;
+      case "inductor":
+        this.reboundReady = true;
+        this.setEffect("电感：获得一次电磁反弹（抵挡一次死亡）", 3000);
+        break;
+      case "burnt":
+        this.die("吃到了烧坏的电路板");
+        return;
+      default:
+        this.growPending = 1;
+        this.setEffect(def.label + "：蛇身长度 +1", 1800);
+    }
+    this.updateStatusBar();
+  };
+
+  SnakeGame.prototype.setEffect = function (text, ms) {
+    this.effectText = text;
+    this.effectUntil = Date.now() + ms;
+    this.updateStatusBar();
+  };
+
+  // 释放电容：3 秒超强速度 + 无敌
+  SnakeGame.prototype.activateCapacitor = function () {
+    if (!this.capacitorReady || !this.alive || this.mode !== "manual") return;
+    clearTimeout(this.boostTimer);
+    const self = this;
+    this.capacitorReady = false;
+    this.preBoostSpeed = this.speed;
+    this.speed = Math.max(58, this.minSpeed - 12);
+    this.boostUntil = Date.now() + 3000;
+    this.setEffect("⚡ 电容爆发：超强速度 + 3 秒无敌！", 3000);
+    this.boostTimer = setTimeout(() => {
+      self.speed = self.preBoostSpeed;
+      self.boostUntil = 0;
+      self.setEffect("电容能量释放完毕", 1500);
+      self.updateStatusBar();
+    }, 3000);
+    this.updateStatusBar();
+  };
+
   SnakeGame.prototype.wouldCollide = function (head) {
     if (head.x < 0 || head.y < 0 || head.x >= this.gridSize || head.y >= this.gridSize) return true;
-    // 注意：尾巴即将离开的那一格不算碰撞（除非马上吃到食物）
     const bodyToCheck = this.snakeBody.slice(0, -1);
     return bodyToCheck.some((seg) => seg.x === head.x && seg.y === head.y);
   };
 
-  // AI：从不会撞的方向里选一个离食物最近的
+  // AI：优先朝食物走，避开危险与障碍
   SnakeGame.prototype.chooseAutoDirection = function () {
     const dirs = ["up", "down", "left", "right"];
-    const opposite = { up: "down", down: "up", left: "right", right: "left" };
     const move = { up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0] };
-
     let best = null;
     let bestDistance = Infinity;
     for (const dir of dirs) {
-      if (dir === opposite[this.dir]) continue; // 不能 180 度掉头
+      if (dir === this.opposite(this.dir)) continue;
       const head = this.snakeBody[0];
       const newHead = { x: head.x + move[dir][0], y: head.y + move[dir][1] };
       if (this.wouldCollide(newHead)) continue;
       const distance = (newHead.x - this.food.x) ** 2 + (newHead.y - this.food.y) ** 2;
-      if (distance < bestDistance) {
-        bestDistance = distance;
-        best = dir;
-      }
+      if (distance < bestDistance) { bestDistance = distance; best = dir; }
     }
     return best;
   };
 
-  // 前进一步（移动 / 吃食物 / 撞墙）
+  // 死亡：动画 + 提醒 + 5 秒后重启
+  SnakeGame.prototype.die = function (reason) {
+    if (!this.alive) return;
+    this.alive = false;
+    this.deathReason = reason;
+    this.deathCount += 1;
+    this.serial += 1;
+    this.stopLoop();
+    this.stopHold();
+
+    if (this.serialEl) this.serialEl.textContent = this.serialText();
+
+    // Steam 风格成就
+    (this.achievements || []).forEach((ach) => {
+      if (ach.times === this.deathCount) pushAchievement(ach.name, ach.quote);
+    });
+
+    showToast("💥 " + reason + "，" + this.serialText() + " 已报废");
+
+    // 死亡爆炸粒子动画
+    const head = this.snakeBody[0];
+    const cx = (head.x + 0.5) * this.cell;
+    const cy = (head.y + 0.5) * this.cell;
+    this.deathParticles = [];
+    for (let i = 0; i < 34; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = (2 + Math.random() * 5) * this.cell * 0.14;
+      this.deathParticles.push({
+        x: cx, y: cy,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        life: 1,
+        decay: 0.018 + Math.random() * 0.022,
+        color: Math.random() > 0.4 ? "#ff6b6b" : "#ffd166"
+      });
+    }
+    this.animateDeathParticles();
+
+    // 5 秒后自动重启（不管自动还是手动模式）
+    this.deathRestartAt = Date.now() + 5000;
+    this.deathTimer = setTimeout(() => {
+      self_restart(this);
+    }, 5000);
+
+    // 死亡倒计时持续刷新画面
+    this.deathDrawTimer = setInterval(() => {
+      if (!this.alive) this.draw();
+    }, 250);
+
+    this.updateStatusBar();
+    this.draw();
+
+    function self_restart(game) {
+      const modeBefore = game.mode;
+      game.resetGame();
+      game.draw();
+      if (modeBefore === "auto") game.startLoop();
+    }
+  };
+
+  SnakeGame.prototype.animateDeathParticles = function () {
+    const self = this;
+    cancelAnimationFrame(this.deathParticleRaf);
+    let last = performance.now();
+    function step(now) {
+      if (self.alive) return;
+      const dt = Math.min(50, now - last);
+      last = now;
+      self.draw();
+      const ctx = self.ctx;
+      const cell = self.cell;
+      let anyAlive = false;
+      for (const p of self.deathParticles) {
+        p.x += p.vx * (dt / 16);
+        p.y += p.vy * (dt / 16);
+        p.vy += 0.06 * cell * 0.04 * (dt / 16);
+        p.life -= p.decay * (dt / 16);
+        if (p.life > 0) anyAlive = true;
+        ctx.globalAlpha = Math.max(0, p.life);
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, cell * 0.16, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+      if (anyAlive) {
+        self.deathParticleRaf = requestAnimationFrame(step);
+      } else {
+        self.deathParticles = [];
+        self.draw();
+      }
+    }
+    this.deathParticleRaf = requestAnimationFrame(step);
+  };
+
   SnakeGame.prototype.tick = function () {
     if (!this.alive || this.paused) return;
 
-    // 自动模式先让 AI 决定方向
     if (this.mode === "auto") {
       const autoDir = this.chooseAutoDirection();
-      if (!autoDir) {
-        // 无路可走：自动模式静默重开，继续当装饰
-        this.resetGame();
-        return;
-      }
+      if (!autoDir) { this.resetGame(); return; }
       this.nextDir = autoDir;
     }
 
@@ -705,12 +1055,21 @@
     const head = this.snakeBody[0];
     const newHead = { x: head.x + move[this.dir][0], y: head.y + move[this.dir][1] };
 
-    // 撞墙 / 撞到自己 -> 游戏结束
+    // 碰撞处理：护盾/电容爆发/电感反弹优先，否则死亡
     if (this.wouldCollide(newHead)) {
-      this.alive = false;
-      this.stopLoop();
-      this.draw();
-      if (this.mode === "manual") showToast("💫 蛇蛇撞到啦，按方向键重新出发");
+      if (this.isInvincible()) {
+        this.bounceBack();
+        this.draw();
+        return;
+      }
+      if (this.reboundReady) {
+        this.reboundReady = false;
+        this.bounceBack();
+        this.setEffect("电感触发：电磁反弹，抵消了一次死亡！", 2200);
+        this.draw();
+        return;
+      }
+      this.die("撞毁在电路板边缘");
       return;
     }
 
@@ -718,21 +1077,29 @@
 
     // 吃到食物
     if (newHead.x === this.food.x && newHead.y === this.food.y) {
-      this.score++;
-      this.updateScore();
+      this.applyFoodEffect(this.food.type);
       this.placeFood();
-      // 吃 3 个加速一点点，自动模式看起来越来越精神
-      if (this.score % 3 === 0 && this.speed > 90) {
-        this.speed = Math.max(90, this.speed - 10);
-        this.startLoop();
-      }
+    } else if (this.growPending > 0) {
+      // 多格生长
+      const tail = this.snakeBody[this.snakeBody.length - 1];
+      for (let i = 0; i < this.growPending; i++) this.snakeBody.push({ x: tail.x, y: tail.y });
+      this.growPending = 0;
     } else {
-      this.snakeBody.pop(); // 没吃到：移除尾巴
+      this.snakeBody.pop();
     }
+
+    // 正常移动后如果还有待生长（吃普通食物只生长 1，不弹尾巴）
+    if (this.growPending > 0) {
+      const tail = this.snakeBody[this.snakeBody.length - 1];
+      for (let i = 0; i < this.growPending; i++) this.snakeBody.push({ x: tail.x, y: tail.y });
+      this.growPending = 0;
+    }
+
+    this.score = this.snakeBody.length;
+    this.updateScore();
     this.draw();
   };
 
-  // 自动循环计时器
   SnakeGame.prototype.startLoop = function () {
     const self = this;
     this.stopLoop();
@@ -750,7 +1117,7 @@
     this.timer = 0;
   };
 
-  // 绘制整个画布（天空棋盘 + 发光小蛇 + 苹果）
+  // ---------- 绘制：科技蛇 + 元件食物 ----------
   SnakeGame.prototype.draw = function () {
     const ctx = this.ctx;
     const size = this.canvas.width;
@@ -759,117 +1126,211 @@
 
     ctx.clearRect(0, 0, size, size);
 
-    // 读取当前主题下的颜色（CSS 变量定义在 style.css 顶部）
     const styles = getComputedStyle(document.documentElement);
-    const primary = styles.getPropertyValue("--primary").trim() || "#29b6f6";
-    const border = styles.getPropertyValue("--border").trim() || "rgba(41,182,246,0.2)";
-    const text = styles.getPropertyValue("--text").trim() || "#102a43";
+    const text = styles.getPropertyValue("--text").trim() || "#e6f4ff";
 
-    // 1. 淡淡的网格线
-    ctx.strokeStyle = border;
+    // 1. 淡网格
+    ctx.strokeStyle = "rgba(46, 230, 168, 0.10)";
     ctx.lineWidth = 1;
     for (let i = 1; i < this.gridSize; i++) {
       const pos = Math.round(i * cell) + 0.5;
-      ctx.globalAlpha = 0.35;
-      ctx.beginPath();
-      ctx.moveTo(pos, 0);
-      ctx.lineTo(pos, size);
-      ctx.stroke();
-      ctx.beginPath();
-      ctx.moveTo(0, pos);
-      ctx.lineTo(size, pos);
-      ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(pos, 0); ctx.lineTo(pos, size); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(0, pos); ctx.lineTo(size, pos); ctx.stroke();
     }
-    ctx.globalAlpha = 1;
 
-    // 2. 食物：画一个红苹果（用 emoji 绘制，简单又好看）
-    ctx.font = Math.round(cell * 0.78) + "px serif";
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.fillText("🍎", this.food.x * cell + cell / 2, this.food.y * cell + cell / 2 + cell * 0.04);
+    // 2. 食物皮肤
+    this.drawFood(ctx, cell);
 
-    // 3. 蛇：从头到尾渐变色，头部发光
+    // 3. 科技蛇：绿色 PCB 蛇身 + 发光电路走线
     for (let i = this.snakeBody.length - 1; i >= 0; i--) {
       const seg = this.snakeBody[i];
-      const ratio = 1 - i / Math.max(1, this.snakeBody.length - 1);
       const x = seg.x * cell;
       const y = seg.y * cell;
-      const pad = Math.max(1.5, cell * 0.06);
+      const pad = Math.max(1.5, cell * 0.08);
       const radius = cell * 0.22;
-
-      // 头部更亮，尾部渐变为更浅的蓝
-      const gradient = ctx.createLinearGradient(x, y, x + cell, y + cell);
-      gradient.addColorStop(0, primary);
-      gradient.addColorStop(1, "#9be7ff");
+      const head = i === 0;
 
       ctx.save();
-      ctx.shadowColor = primary;
-      ctx.shadowBlur = i === 0 ? cell * 0.45 : cell * 0.2;
-      ctx.fillStyle = gradient;
+      ctx.shadowColor = head ? "#2ee6a8" : "#0f7a5a";
+      ctx.shadowBlur = head ? cell * 0.55 : cell * 0.22;
+      ctx.fillStyle = head ? "#0d5c40" : "#0b3d2b";
+      ctx.strokeStyle = head ? "#3dffb0" : "#2ee6a8";
+      ctx.lineWidth = Math.max(1, cell * 0.06);
       ctx.beginPath();
-      // 兼容不支持 roundRect 的老浏览器：退化为普通圆角矩形
       if (typeof ctx.roundRect === "function") {
         ctx.roundRect(x + pad, y + pad, cell - pad * 2, cell - pad * 2, radius);
       } else {
         ctx.rect(x + pad, y + pad, cell - pad * 2, cell - pad * 2);
       }
       ctx.fill();
+      ctx.stroke();
       ctx.restore();
 
-      // 给蛇头画两只小眼睛
-      if (i === 0) {
+      // PCB 走线：每节画一条横线 + 两个焊点
+      ctx.save();
+      ctx.globalAlpha = 0.55;
+      ctx.strokeStyle = head ? "#7dffd2" : "#2ee6a8";
+      ctx.lineWidth = Math.max(1, cell * 0.05);
+      const cy = y + cell / 2;
+      ctx.beginPath(); ctx.moveTo(x + cell * 0.2, cy); ctx.lineTo(x + cell * 0.8, cy); ctx.stroke();
+      ctx.fillStyle = "#ffd166";
+      ctx.beginPath(); ctx.arc(x + cell * 0.24, cy, Math.max(1, cell * 0.06), 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(x + cell * 0.76, cy, Math.max(1, cell * 0.06), 0, Math.PI * 2); ctx.fill();
+      ctx.restore();
+
+      if (head) {
+        // 科技蛇头部：LED 眼睛 + 额头编号
         const cx = x + cell / 2;
-        const cy = y + cell / 2;
-        const eyeR = Math.max(1.5, cell * 0.07);
-        const eyeOff = cell * 0.18;
-        ctx.fillStyle = "#ffffff";
+        const eyeR = Math.max(1.6, cell * 0.09);
+        const eyeOff = cell * 0.2;
+        ctx.fillStyle = "#9fffe0";
+        ctx.shadowColor = "#3dffb0";
+        ctx.shadowBlur = cell * 0.4;
         const eyePositions = {
           up: [[cx - eyeOff, cy - eyeOff], [cx + eyeOff, cy - eyeOff]],
           down: [[cx - eyeOff, cy + eyeOff], [cx + eyeOff, cy + eyeOff]],
           left: [[cx - eyeOff, cy - eyeOff], [cx - eyeOff, cy + eyeOff]],
           right: [[cx + eyeOff, cy - eyeOff], [cx + eyeOff, cy + eyeOff]]
         }[this.dir] || [[cx - eyeOff, cy], [cx + eyeOff, cy]];
-        ctx.beginPath();
-        ctx.arc(eyePositions[0][0], eyePositions[0][1], eyeR, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.beginPath();
-        ctx.arc(eyePositions[1][0], eyePositions[1][1], eyeR, 0, Math.PI * 2);
-        ctx.fill();
+        ctx.beginPath(); ctx.arc(eyePositions[0][0], eyePositions[0][1], eyeR, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(eyePositions[1][0], eyePositions[1][1], eyeR, 0, Math.PI * 2); ctx.fill();
+        ctx.shadowBlur = 0;
+
+        // 蛇身编号：写在头部附近
+        ctx.font = "700 " + Math.round(cell * 0.30) + "px sans-serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "bottom";
+        ctx.fillStyle = "#a8ffe0";
+        ctx.shadowColor = "rgba(0,0,0,0.8)";
+        ctx.shadowBlur = 3;
+        const labelY = seg.y > 0 ? y - cell * 0.12 : y + cell * 1.1;
+        ctx.fillText(this.serialText(), cx, labelY);
+        ctx.shadowBlur = 0;
       }
     }
 
-    // 4. 手动模式失败时盖一层半透明提示
-    if (!this.alive) {
-      ctx.fillStyle = "rgba(8, 20, 38, 0.62)";
-      ctx.fillRect(0, 0, size, size);
-      ctx.fillStyle = "#ffffff";
-      ctx.font = "600 " + Math.round(cell * 0.55) + "px sans-serif";
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      ctx.fillText("💫 按方向键继续", size / 2, size / 2);
+    // 4. 护盾 / 电容爆发光环
+    if (this.isInvincible() && this.snakeBody.length) {
+      const hx = this.snakeBody[0].x * cell + cell / 2;
+      const hy = this.snakeBody[0].y * cell + cell / 2;
+      ctx.save();
+      ctx.strokeStyle = "rgba(127, 224, 255, 0.85)";
+      ctx.lineWidth = Math.max(1.5, cell * 0.08);
+      ctx.shadowColor = "#7fe0ff";
+      ctx.shadowBlur = cell * 0.7;
+      ctx.globalAlpha = 0.65 + 0.25 * Math.sin(Date.now() / 180);
+      ctx.beginPath();
+      ctx.arc(hx, hy, cell * 0.85, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
     }
 
-    // 5. 自动模式时在角落画一个小小的“自动”标记
-    if (this.mode === "auto" && this.alive) {
-      ctx.font = Math.round(cell * 0.34) + "px sans-serif";
+    // 5. 死亡状态：爆炸粒子结束后显示报废提醒 + 重启倒计时
+    if (!this.alive) {
+      const remain = Math.max(0, Math.ceil((this.deathRestartAt - Date.now()) / 1000));
+      ctx.fillStyle = "rgba(5, 14, 26, 0.72)";
+      ctx.fillRect(0, 0, size, size);
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillStyle = "#ff8b8b";
+      ctx.font = "800 " + Math.round(cell * 0.6) + "px sans-serif";
+      ctx.fillText("💥 蛇蛇已报废", size / 2, size / 2 - cell * 0.7);
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "600 " + Math.round(cell * 0.42) + "px sans-serif";
+      ctx.fillText(this.deathReason, size / 2, size / 2);
+      ctx.fillStyle = "#7fe0ff";
+      ctx.font = "700 " + Math.round(cell * 0.46) + "px sans-serif";
+      ctx.fillText(remain + " 秒后自动重启", size / 2, size / 2 + cell * 0.8);
+      ctx.fillStyle = "#ffd166";
+      ctx.font = "600 " + Math.round(cell * 0.34) + "px sans-serif";
+      ctx.fillText("下一台：" + this.serialText(), size / 2, size / 2 + cell * 1.5);
+    }
+
+    // 6. 模式角标
+    if (this.alive) {
+      ctx.font = Math.round(cell * 0.32) + "px sans-serif";
       ctx.textAlign = "left";
       ctx.textBaseline = "top";
       ctx.fillStyle = text;
-      ctx.globalAlpha = 0.45;
-      ctx.fillText("自动模式 · 按键可接管", cell * 0.4, cell * 0.35);
+      ctx.globalAlpha = 0.55;
+      ctx.fillText(this.mode === "auto" ? "AI 自动模式" : "手动模式", cell * 0.4, cell * 0.35);
       ctx.globalAlpha = 1;
     }
   };
 
-  // 页面不再需要时清理（本项目单页一般不调用）
+  // 绘制各种元件食物皮肤
+  SnakeGame.prototype.drawFood = function (ctx, cell) {
+    const def = FOOD_DEFS[this.food.type] || FOOD_DEFS.code;
+    const x = this.food.x * cell;
+    const y = this.food.y * cell;
+    const pad = cell * 0.10;
+    const w = cell - pad * 2;
+    const cx = x + cell / 2;
+    const cy = y + cell / 2;
+
+    ctx.save();
+
+    // 烧坏的电路板：红色危险提示 + 闪烁
+    if (this.food.type === "burnt") {
+      const blink = 0.7 + 0.3 * Math.sin(Date.now() / 140);
+      ctx.shadowColor = "#ff4d4d";
+      ctx.shadowBlur = cell * 0.8;
+      ctx.globalAlpha = blink;
+      ctx.fillStyle = "#3a0d0d";
+      ctx.strokeStyle = "#ff4d4d";
+      ctx.lineWidth = Math.max(1.5, cell * 0.08);
+      ctx.beginPath();
+      if (typeof ctx.roundRect === "function") ctx.roundRect(x + pad, y + pad, w, w, cell * 0.18);
+      else ctx.rect(x + pad, y + pad, w, w);
+      ctx.fill(); ctx.stroke();
+    } else {
+      ctx.shadowColor = def.color;
+      ctx.shadowBlur = cell * 0.5;
+      ctx.fillStyle = "rgba(8, 20, 38, 0.92)";
+      ctx.strokeStyle = def.color;
+      ctx.lineWidth = Math.max(1.2, cell * 0.06);
+      ctx.beginPath();
+      if (typeof ctx.roundRect === "function") ctx.roundRect(x + pad, y + pad, w, w, cell * 0.18);
+      else ctx.rect(x + pad, y + pad, w, w);
+      ctx.fill(); ctx.stroke();
+    }
+
+    // 元件符号 / 文字
+    ctx.shadowBlur = 0;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillStyle = this.food.type === "burnt" ? "#ff8b8b" : def.color;
+    if (this.food.type === "book") {
+      ctx.font = Math.round(cell * 0.62) + "px serif";
+      ctx.fillText(def.glyph, cx, cy);
+    } else {
+      ctx.font = "800 " + Math.round(cell * 0.44) + "px sans-serif";
+      ctx.fillText(def.glyph, cx, cy + cell * 0.02);
+    }
+
+    // 烧坏板额外画个骷髅底纹提示
+    if (this.food.type === "burnt") {
+      ctx.font = Math.round(cell * 0.3) + "px sans-serif";
+      ctx.fillText("☠", cx, cy);
+    }
+
+    ctx.restore();
+  };
+
   SnakeGame.prototype.destroy = function () {
     this.stopLoop();
     this.stopHold();
+    clearInterval(this.statusTimer);
+    clearTimeout(this.deathTimer);
+    clearInterval(this.deathDrawTimer);
+    clearTimeout(this.boostTimer);
+    cancelAnimationFrame(this.deathParticleRaf);
     if (this.observer) this.observer.disconnect();
     window.removeEventListener("resize", this.onResize);
     this.wrap.removeEventListener("touchstart", this.onTouchStart);
     this.wrap.removeEventListener("touchend", this.onTouchEnd);
   };
+
 
   /* ------------------------------------------------------------------
    * 四、渲染各版块统一标题
@@ -1430,6 +1891,13 @@
         if (snake.visible) event.preventDefault();
         snake.setManualMode();
         snake.requestDirection(keyMap[event.key]);
+      }
+
+      // 空格：手动模式下释放电容技能（超强速度 + 3 秒无敌）
+      if ((event.code === "Space" || event.key === " ") && snake.visible) {
+        event.preventDefault();
+        snake.setManualMode();
+        snake.activateCapacitor();
       }
     });
 
