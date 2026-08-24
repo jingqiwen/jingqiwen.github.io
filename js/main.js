@@ -475,6 +475,7 @@
       '      <div class="wisdom-star" id="wisdom-star" title="智慧之星">★</div>' +
       '      <div class="wisdom-hint" id="wisdom-hint">' + escapeHtml(config.starHint || "点亮条件：玩家先将贪吃蛇通关失败一次，随后再通关成功一次") + "</div>" +
       "    </div>" +
+      '    <div class="pass-rule">通关条件：贪吃蛇长度达到 ' + Number(config.passLength || 15) + ' 即视为游戏通关</div>' +
       '    <div class="snake-mode-badge" id="snake-mode">AI插件托管中</div>' +
       '    <div class="console-screen">' +
       '      <div class="screen-vent vent-1"></div><div class="screen-vent vent-2"></div>' +
@@ -500,6 +501,10 @@
       '        <button type="button" class="mini-btn" id="snake-reset">重新开始</button>' +
       "      </div>" +
       "    </div>" +
+      "  </div>" +
+      // 小字说明放在游戏机下方，不写进游戏机外壳里
+      '  <div class="snake-footer-legend">' +
+      "    元件说明：51芯片=加速 · 32芯片=长度+2 · 书本=长度+1 · 代码=长度+1 · 数据流=10秒护盾 · 电容=储能后手动释放（3秒超速无敌） · 电阻=减速 · 电感=电磁反弹一次 · 烧坏的电路板=3秒后消失，吃到立即死亡" +
       "  </div>" +
       "</div>";
 
@@ -588,17 +593,8 @@
     this.deathParticleRaf = 0;
     this.achievements = this.config.achievements || [];
 
-    // 智慧之星：每次进入/刷新网页都从“熄灭”状态重新开始，
-    // 本局需要先死一次、再通关一次才能点亮（不读取历史点亮状态）
+    // 智慧之星、死亡记录、蛇身编号：每次进入/刷新网页都从零开始，不保留历史进度
     this.wisdomLit = false;
-    try {
-      // 只恢复死亡累计记录与蛇身编号（成就记录不丢失），智慧之星进度不恢复
-      const saved = JSON.parse(localStorage.getItem("wjq-snake-progress") || "{}");
-      this.deathCount = Number(saved.deathCount) || 0;
-      this.serial = Number(saved.serial) || (this.deathCount + 1);
-    } catch (error) {
-      // 没有记录或解析失败时，按全新进度开始
-    }
 
     this.ctx = null;
     this.cell = 0;
@@ -759,48 +755,55 @@
     this.updateStatusBar();
   };
 
-  // 加权随机选择食物皮肤
-  SnakeGame.prototype.rollFoodType = function () {
+  // 加权随机选择食物皮肤；allowBurnt=false 时不会抽到烧坏的电路板
+  SnakeGame.prototype.rollFoodType = function (allowBurnt) {
+    const includeBurnt = allowBurnt !== false;
     let total = 0;
-    Object.keys(FOOD_DEFS).forEach((key) => (total += FOOD_DEFS[key].weight));
+    Object.keys(FOOD_DEFS).forEach((key) => {
+      if (key === "burnt" && !includeBurnt) return;
+      total += FOOD_DEFS[key].weight;
+    });
     let roll = Math.random() * total;
     for (const key of Object.keys(FOOD_DEFS)) {
+      if (key === "burnt" && !includeBurnt) continue;
       roll -= FOOD_DEFS[key].weight;
       if (roll <= 0) return key;
     }
     return "code";
   };
 
-  SnakeGame.prototype.placeFood = function () {
-    const type = this.rollFoodType();
+  SnakeGame.prototype.placeFood = function (allowBurnt) {
+    const type = this.rollFoodType(allowBurnt);
     for (let tries = 0; tries < 600; tries++) {
       const x = Math.floor(Math.random() * this.gridSize);
       const y = Math.floor(Math.random() * this.gridSize);
       if (!this.snakeBody.some((seg) => seg.x === x && seg.y === y)) {
         this.food = { x, y, type };
+        this.foodBornAt = Date.now(); // 记录出现时间（烧坏板 3 秒后消失）
         return;
       }
     }
     this.food = { x: 0, y: 0, type };
+    this.foodBornAt = Date.now();
+  };
+
+  // 烧坏的电路板：出现 3 秒后自动消失，换成一个随机新元件
+  SnakeGame.prototype.checkBurntExpire = function () {
+    if (!this.alive || this.food.type !== "burnt") return;
+    if (Date.now() - this.foodBornAt >= 3000) {
+      this.placeFood(false);
+      this.setEffect("烧坏的电路板已消失，随机新元件出现", 1800);
+      this.draw();
+    }
   };
 
   SnakeGame.prototype.updateScore = function () {
     if (this.scoreEl) this.scoreEl.textContent = "长度 " + this.score;
   };
 
-  // 保存进度：只保存死亡累计次数与蛇身编号（智慧之星每次进入网页都重新点亮）
+  // 进度不持久化：刷新后死亡记录、蛇身编号、智慧之星全部重置
   SnakeGame.prototype.saveProgress = function () {
-    try {
-      localStorage.setItem(
-        "wjq-snake-progress",
-        JSON.stringify({
-          deathCount: this.deathCount,
-          serial: this.serial
-        })
-      );
-    } catch (error) {
-      // 隐私模式无法保存时忽略
-    }
+    // 本函数保留为空，方便以后想重新开启存档时在这里加 localStorage
   };
 
   // 智慧之星：必须先死一次、再通关一次，即 firstPassAt 晚于 firstDeathAt
@@ -809,7 +812,7 @@
     if (shouldLit && !this.wisdomLit) {
       this.wisdomLit = true;
       this.saveProgress();
-      showToast("🌟 智慧之星已点亮：游戏机亮度提升 30%");
+      showToast("🌟 智慧之星已点亮：整个网页亮度提升 30%");
     }
     if (this.wisdomLit) this.saveProgress();
 
@@ -819,9 +822,11 @@
     }
     if (this.hintEl) {
       this.hintEl.textContent = this.wisdomLit
-        ? "智慧之星已点亮：界面亮度提升 30%"
-        : (this.config.starHint || "点亮：条件死亡一次，并通关一次后智慧之星将会被点亮");
+        ? "智慧之星已点亮：整个网页亮度提升 30%"
+        : (this.config.starHint || "点亮条件：玩家先将贪吃蛇通关失败一次，随后再通关成功一次");
     }
+    // 亮度提升作用于整个网页（背景、正文、导航、目录、游戏机都变亮）
+    document.documentElement.classList.toggle("wisdom-lit", this.wisdomLit);
     if (this.cardEl) {
       this.cardEl.classList.toggle("wisdom-lit", this.wisdomLit);
     }
@@ -843,6 +848,9 @@
   SnakeGame.prototype.updateStatusBar = function () {
     const now = Date.now();
     if (this.serialEl) this.serialEl.textContent = this.serialText();
+
+    // 烧坏的电路板 3 秒后自动消失
+    this.checkBurntExpire();
 
     // 数据流护盾倒计时
     let shieldText = "🛡 护盾 --";
@@ -1366,6 +1374,14 @@
     } else {
       ctx.font = "900 " + Math.round(cell * 0.42) + "px sans-serif";
       ctx.fillText(def.glyph, cx, cy + cell * 0.02);
+    }
+
+    // 烧坏板：显示剩余消失秒数
+    if (burnt) {
+      const left = Math.max(0, Math.ceil(((this.foodBornAt || Date.now()) + 3000 - Date.now()) / 1000));
+      ctx.font = "800 " + Math.round(cell * 0.26) + "px sans-serif";
+      ctx.fillStyle = "#ffd0d0";
+      ctx.fillText(left + "s", cx, y + cell * 0.82);
     }
 
     ctx.restore();

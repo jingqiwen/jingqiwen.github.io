@@ -2765,6 +2765,35 @@ body.earth-cursor-active * {
 .status-serial { background: rgba(41, 182, 246, 0.12); border-color: rgba(41, 182, 246, 0.35); color: var(--primary-strong); }
 :root[data-theme="dark"] .status-serial { color: #6dffc0; }
 
+/* 通关条件：写在外壳上、屏幕上方 */
+.pass-rule {
+  position: relative;
+  z-index: 3;
+  margin: 0 0 8px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: rgba(255, 209, 102, 0.16);
+  border: 1px dashed rgba(255, 190, 60, 0.55);
+  color: #9a6b00;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+:root[data-theme="dark"] .pass-rule { color: #ffd166; }
+
+/* 游戏机下方的小字说明 */
+.snake-footer-legend {
+  margin-top: 12px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text-weak);
+  font-size: 0.7rem;
+  line-height: 1.6;
+  text-align: center;
+}
+
 /* 模式角标：放在屏幕外、游戏机顶部，字体大且醒目 */
 .snake-mode-badge {
   position: relative;
@@ -2835,8 +2864,18 @@ body.earth-cursor-active * {
   color: var(--text-secondary);
 }
 
-/* 智慧之星点亮后：游戏机亮度提升 30% */
-.snake-card.wisdom-lit .snake-console {
+/* 智慧之星点亮后：整个网页（背景、正文、导航、目录、游戏机）亮度提升 30% */
+html.wisdom-lit body::before,
+html.wisdom-lit .star-field,
+html.wisdom-lit .sky-scene,
+html.wisdom-lit main,
+html.wisdom-lit .footer,
+html.wisdom-lit .navbar,
+html.wisdom-lit .toc-toggle,
+html.wisdom-lit .toc-panel,
+html.wisdom-lit .back-top,
+html.wisdom-lit .achievement-box,
+html.wisdom-lit .earth-cursor {
   filter: brightness(1.30);
 }
 
