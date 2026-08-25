@@ -2521,6 +2521,36 @@ body.earth-cursor-active * {
   background: rgba(255, 255, 255, 0.20);
 }
 
+/* 强制执行：暗色主题下笔记本纸张也使用和亮色完全一样的米黄色 */
+:root[data-theme="dark"] .notebook-shell .diary-book,
+.notebook-shell .diary-book {
+  background:
+    linear-gradient(90deg, rgba(90, 60, 20, 0.18) 0%, transparent 5%, transparent 95%, rgba(90, 60, 20, 0.18) 100%),
+    #f6ecd2 !important;
+}
+
+.notebook-shell .diary-page { background: transparent; }
+
+:root[data-theme="dark"] .notebook-shell .diary-page-left,
+.notebook-shell .diary-page-left {
+  background: repeating-linear-gradient(0deg, rgba(70, 110, 160, 0.07) 0 1px, transparent 1px 34px) !important;
+}
+
+:root[data-theme="dark"] .notebook-shell .diary-page-right,
+.notebook-shell .diary-page-right {
+  background: rgba(255, 255, 255, 0.20) !important;
+  border-left-color: rgba(90, 70, 30, 0.25) !important;
+}
+
+:root[data-theme="dark"] .notebook-shell .diary-name,
+:root[data-theme="dark"] .notebook-shell .diary-role,
+:root[data-theme="dark"] .notebook-shell .diary-desc {
+  color: #3a2a18;
+}
+
+:root[data-theme="dark"] .notebook-shell .diary-role { color: #9a5a18; }
+:root[data-theme="dark"] .notebook-shell .diary-desc { color: #4b3a26; }
+
 .notebook-shell .diary-name { font-size: 1.7rem; color: #3a2a18; }
 .notebook-shell .diary-role { color: #9a5a18; }
 .notebook-shell .diary-desc { color: #4b3a26; }
