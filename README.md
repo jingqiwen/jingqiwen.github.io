@@ -32,6 +32,37 @@
 
 所有图片放入 `assets/` 文件夹，再把 `config.js` 中的路径改为文件名即可。
 
+## 二点五、如何上传图片和视频到各内容框
+
+学习经历、项目成果、比赛获奖、我的笔记都已预留 6 个填写框。每个框支持图片和视频：
+
+1. **准备文件**
+   - 图片建议使用 `.jpg` / `.png`，单张尽量控制在 500KB 以内。
+   - 视频建议使用 `.mp4`（H.264 编码，浏览器都能播放），单个视频建议控制在 100MB 以内。
+2. **把文件放进 `assets/` 文件夹**
+   - 例如：`assets/项目1.jpg`、`assets/比赛1.mp4`、`assets/笔记1.png`。
+3. **在 `js/config.js` 对应条目里填写路径**
+   - 项目封面：`cover: "assets/项目1.jpg"`
+   - 通用图片：`image: "assets/比赛1.jpg"`
+   - 视频：`video: "assets/比赛1.mp4"`
+   - 没想好就保持 `""`（空字符串），页面会自动隐藏该媒体框。
+4. **示例（项目）**
+   ```js
+   {
+     title: "我的项目名称",
+     category: "嵌入式",
+     summary: "项目介绍……",
+     cover: "assets/项目1.jpg",
+     video: "assets/项目1.mp4",
+     tags: ["STM32"],
+     github: "https://github.com/jingqiwen/项目仓库",
+     demo: ""
+   }
+   ```
+5. 修改完成后，用 Git 把图片/视频和 `config.js` 一起提交推送，GitHub Pages 会自动更新。
+
+> 提示：视频超过 100MB 时建议先压缩，或上传到 B站/YouTube 后，把在线链接填到 `demo` 或笔记的 `link` 字段。
+
 ## 三、部署到 GitHub Pages
 
 ### 方式 A：项目主页（适合个人网站仓库）

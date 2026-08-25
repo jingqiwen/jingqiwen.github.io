@@ -1487,6 +1487,26 @@
     return '<div class="tag-row">' + tags.map((t) => '<span class="tag">' + escapeHtml(t) + "</span>").join("") + "</div>";
   }
 
+  // 生成图片/视频展示块：
+  //   把图片放到 assets 文件夹，配置 image: "assets/xxx.jpg"
+  //   把视频放到 assets 文件夹，配置 video: "assets/xxx.mp4"
+  function mediaBlock(image, video, alt) {
+    let html = "";
+    if (video) {
+      html +=
+        '<div class="media-box">' +
+        '<video class="media-video" controls preload="metadata" src="' + escapeHtml(video) + '" title="' + escapeHtml(alt || "") + '"></video>' +
+        "</div>";
+    }
+    if (image) {
+      html +=
+        '<div class="media-box">' +
+        '<img src="' + escapeHtml(image) + '" alt="' + escapeHtml(alt || "") + '" loading="lazy" />' +
+        "</div>";
+    }
+    return html;
+  }
+
   /* ------------------------------------------------------------------
    * 六、渲染技能（单列：从上到下一行一个技能，每个进度条占一行）
    * ------------------------------------------------------------------ */
@@ -1552,6 +1572,7 @@
           '    <h3 class="timeline-name">' + escapeHtml(item.name) + "</h3>" +
           '    <p class="timeline-role">' + escapeHtml(item.role || "") + "</p>" +
           '    <p class="timeline-desc">' + escapeHtml(item.desc || "") + "</p>" +
+          mediaBlock(item.image, item.video, item.name) +
           tagRow(item.tags) +
           "  </div>" +
           "</div>"
@@ -1578,6 +1599,7 @@
           '  <h3 class="award-name">' + escapeHtml(item.name) + "</h3>" +
           '  <p class="award-level">' + escapeHtml(item.level || "") + "</p>" +
           '  <p class="award-desc">' + escapeHtml(item.desc || "") + "</p>" +
+          mediaBlock(item.image, item.video, item.name) +
           tagRow(item.tags) +
           "</article>"
       )
@@ -1627,6 +1649,7 @@
         '    <span class="project-category">' + escapeHtml(project.category) + "</span>" +
         '    <h3 class="project-title">' + escapeHtml(project.title) + "</h3>" +
         '    <p class="project-summary">' + escapeHtml(project.summary) + "</p>" +
+        mediaBlock("", project.video, project.title) +
         tagRow(project.tags) +
         (actions.length ? '<div class="project-actions">' + actions.join("") + "</div>" : "") +
         "  </div>" +
@@ -1669,6 +1692,7 @@
           "  </div>" +
           '  <h3 class="note-title">' + escapeHtml(note.title) + "</h3>" +
           '  <p class="note-summary">' + escapeHtml(note.summary || "") + "</p>" +
+          mediaBlock(note.image, note.video, note.title) +
           (hasLink ? '<div class="project-actions"><a class="link-btn" href="' + escapeHtml(note.link) + '" target="_blank" rel="noopener">📖 阅读笔记</a></div>' : "") +
           "</article>"
         );

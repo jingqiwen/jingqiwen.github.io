@@ -212,14 +212,18 @@ const SITE_CONFIG = {
     title: "学习经历",
     subtitle: "学习与实践的足迹",
 
+    // 【必改】已预留 6 个学习经历框，按顺序填写即可：
+    //   time = 时间；name = 标题；role = 学习方向/角色；desc = 介绍；
+    //   image = 图片路径（如 "assets/学习1.jpg"），没有就写 ""
+    //   video = 视频路径（如 "assets/学习1.mp4"），没有就写 ""
+    // 多余的空框可以整段删除，不够就复制整段再加一个。
     items: [
-      {
-        time: "（温景淇还没有写这部分的代码）",
-        name: "（温景淇还没有写这部分的代码）",
-        role: "（温景淇还没有写这部分的代码）",
-        desc: "（温景淇还没有写这部分的代码）",
-        tags: ["待拓展"]
-      }
+      { time: "待填写", name: "学习经历 · 占位 1/6", role: "（温景淇还没有写这部分的代码）", desc: "（温景淇还没有写这部分的代码）", image: "", video: "", tags: ["待填写"] },
+      { time: "待填写", name: "学习经历 · 占位 2/6", role: "（温景淇还没有写这部分的代码）", desc: "（温景淇还没有写这部分的代码）", image: "", video: "", tags: ["待填写"] },
+      { time: "待填写", name: "学习经历 · 占位 3/6", role: "（温景淇还没有写这部分的代码）", desc: "（温景淇还没有写这部分的代码）", image: "", video: "", tags: ["待填写"] },
+      { time: "待填写", name: "学习经历 · 占位 4/6", role: "（温景淇还没有写这部分的代码）", desc: "（温景淇还没有写这部分的代码）", image: "", video: "", tags: ["待填写"] },
+      { time: "待填写", name: "学习经历 · 占位 5/6", role: "（温景淇还没有写这部分的代码）", desc: "（温景淇还没有写这部分的代码）", image: "", video: "", tags: ["待填写"] },
+      { time: "待填写", name: "学习经历 · 占位 6/6", role: "（温景淇还没有写这部分的代码）", desc: "（温景淇还没有写这部分的代码）", image: "", video: "", tags: ["待填写"] }
     ]
   },
 
@@ -230,18 +234,20 @@ const SITE_CONFIG = {
     title: "项目成果展示及资料",
     subtitle: "把想法变成作品 · 附项目资料与 GitHub 仓库链接",
 
-    filters: ["全部", "嵌入式", "软件", "人工智能", "其他"],
+    filters: ["全部", "待分类", "嵌入式", "软件", "人工智能", "其他"],
 
+    // 【必改】已预留 6 个项目框：
+    //   cover = 项目封面图（可上传到 assets 文件夹）
+    //   video = 项目演示视频（如 "assets/项目1.mp4"），没有就写 ""
+    //   github = GitHub 仓库链接，没有就写 "#"
+    //   demo   = 在线演示链接，没有就写 ""
     items: [
-      {
-        title: "（温景淇还没有写这部分的代码）",
-        category: "嵌入式",
-        summary: "（温景淇还没有写这部分的代码）",
-        cover: "assets/project-cover.svg",
-        tags: ["待拓展"],
-        github: "#",
-        demo: ""
-      }
+      { title: "项目成果 · 占位 1/6", category: "待分类", summary: "（温景淇还没有写这部分的代码）", cover: "assets/project-cover.svg", video: "", tags: ["待填写"], github: "#", demo: "" },
+      { title: "项目成果 · 占位 2/6", category: "待分类", summary: "（温景淇还没有写这部分的代码）", cover: "assets/project-cover.svg", video: "", tags: ["待填写"], github: "#", demo: "" },
+      { title: "项目成果 · 占位 3/6", category: "待分类", summary: "（温景淇还没有写这部分的代码）", cover: "assets/project-cover.svg", video: "", tags: ["待填写"], github: "#", demo: "" },
+      { title: "项目成果 · 占位 4/6", category: "待分类", summary: "（温景淇还没有写这部分的代码）", cover: "assets/project-cover.svg", video: "", tags: ["待填写"], github: "#", demo: "" },
+      { title: "项目成果 · 占位 5/6", category: "待分类", summary: "（温景淇还没有写这部分的代码）", cover: "assets/project-cover.svg", video: "", tags: ["待填写"], github: "#", demo: "" },
+      { title: "项目成果 · 占位 6/6", category: "待分类", summary: "（温景淇还没有写这部分的代码）", cover: "assets/project-cover.svg", video: "", tags: ["待填写"], github: "#", demo: "" }
     ]
   },
 
@@ -252,14 +258,15 @@ const SITE_CONFIG = {
     title: "参加比赛及获奖情况",
     subtitle: "每一次挑战都是成长",
 
+    // 【必改】已预留 6 个比赛/获奖框：
+    //   image = 证书或现场照片路径；video = 比赛视频路径；没有就写 ""
     items: [
-      {
-        time: "（温景淇还没有写这部分的代码）",
-        name: "（温景淇还没有写这部分的代码）",
-        level: "（温景淇还没有写这部分的代码）",
-        desc: "（温景淇还没有写这部分的代码）",
-        tags: ["待拓展"]
-      }
+      { time: "待填写", name: "比赛及获奖 · 占位 1/6", level: "（温景淇还没有写这部分的代码）", desc: "（温景淇还没有写这部分的代码）", image: "", video: "", tags: ["待填写"] },
+      { time: "待填写", name: "比赛及获奖 · 占位 2/6", level: "（温景淇还没有写这部分的代码）", desc: "（温景淇还没有写这部分的代码）", image: "", video: "", tags: ["待填写"] },
+      { time: "待填写", name: "比赛及获奖 · 占位 3/6", level: "（温景淇还没有写这部分的代码）", desc: "（温景淇还没有写这部分的代码）", image: "", video: "", tags: ["待填写"] },
+      { time: "待填写", name: "比赛及获奖 · 占位 4/6", level: "（温景淇还没有写这部分的代码）", desc: "（温景淇还没有写这部分的代码）", image: "", video: "", tags: ["待填写"] },
+      { time: "待填写", name: "比赛及获奖 · 占位 5/6", level: "（温景淇还没有写这部分的代码）", desc: "（温景淇还没有写这部分的代码）", image: "", video: "", tags: ["待填写"] },
+      { time: "待填写", name: "比赛及获奖 · 占位 6/6", level: "（温景淇还没有写这部分的代码）", desc: "（温景淇还没有写这部分的代码）", image: "", video: "", tags: ["待填写"] }
     ]
   },
 
@@ -270,14 +277,16 @@ const SITE_CONFIG = {
     title: "我的笔记",
     subtitle: "记录学习、竞赛与开发过程中的思考",
 
+    // 【必改】已预留 6 个笔记框：
+    //   image/video = 笔记配图或讲解视频路径；没有就写 ""
+    //   link = 笔记原文链接，没有就写 "#"
     items: [
-      {
-        date: "（温景淇还没有写这部分的代码）",
-        title: "（温景淇还没有写这部分的代码）",
-        category: "待拓展",
-        summary: "（温景淇还没有写这部分的代码）",
-        link: "#"
-      }
+      { date: "待填写", title: "我的笔记 · 占位 1/6", category: "待分类", summary: "（温景淇还没有写这部分的代码）", image: "", video: "", link: "#" },
+      { date: "待填写", title: "我的笔记 · 占位 2/6", category: "待分类", summary: "（温景淇还没有写这部分的代码）", image: "", video: "", link: "#" },
+      { date: "待填写", title: "我的笔记 · 占位 3/6", category: "待分类", summary: "（温景淇还没有写这部分的代码）", image: "", video: "", link: "#" },
+      { date: "待填写", title: "我的笔记 · 占位 4/6", category: "待分类", summary: "（温景淇还没有写这部分的代码）", image: "", video: "", link: "#" },
+      { date: "待填写", title: "我的笔记 · 占位 5/6", category: "待分类", summary: "（温景淇还没有写这部分的代码）", image: "", video: "", link: "#" },
+      { date: "待填写", title: "我的笔记 · 占位 6/6", category: "待分类", summary: "（温景淇还没有写这部分的代码）", image: "", video: "", link: "#" }
     ]
   },
 

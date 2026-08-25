@@ -973,6 +973,17 @@ body.earth-cursor-active * {
   font-size: 1.02rem;
 }
 
+/* 亮色主题：专业与简介两行使用白色，配合天空背景更清晰 */
+:root[data-theme="light"] .hero-role {
+  color: #ffffff;
+  text-shadow: 0 1px 6px rgba(15, 45, 75, 0.45);
+}
+
+:root[data-theme="light"] .hero-desc {
+  color: #ffffff;
+  text-shadow: 0 1px 6px rgba(15, 45, 75, 0.45);
+}
+
 /* 小徽章行：学校、城市、年级 */
 .hero-badges {
   display: flex;
@@ -2044,6 +2055,30 @@ body.earth-cursor-active * {
   transform: translateY(-2px);
   border-color: var(--border-strong);
   box-shadow: 0 6px 16px rgba(41, 182, 246, 0.22);
+}
+
+/* 通用图片/视频展示框：学习经历、项目、比赛获奖、笔记都能用 */
+.media-box {
+  margin-top: 14px;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background: var(--surface-solid);
+  box-shadow: 0 6px 16px rgba(41, 143, 202, 0.12);
+}
+
+.media-box img,
+.media-box video {
+  display: block;
+  width: 100%;
+  max-height: 380px;
+  object-fit: cover;
+  background: #000;
+}
+
+.media-box video {
+  max-height: 320px;
+  object-fit: contain;
 }
 
 /* ---------------------------------------------------------------------
