@@ -2312,9 +2312,15 @@ body.earth-cursor-active * {
   text-align: center;
 }
 
-/* “开始阅读”按钮 */
+/* “开始阅读”按钮（位于笔记本下方） */
+.notebook-open-wrap {
+  margin-top: 22px;
+  text-align: center;
+}
+
+.notebook-open-wrap.hidden { display: none; }
+
 .notebook-open-btn {
-  margin-bottom: 18px;
   padding: 14px 34px;
   border-radius: 999px;
   background: var(--gradient);

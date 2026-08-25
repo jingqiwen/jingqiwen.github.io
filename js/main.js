@@ -1574,7 +1574,6 @@
 
     list.innerHTML =
       '<div class="notebook-shell reveal">' +
-      '  <button type="button" class="notebook-open-btn" id="notebook-open">📖 开始阅读</button>' +
       '  <div class="notebook" id="notebook">' +
       '    <button type="button" class="notebook-close" id="notebook-close" aria-label="合上笔记本">×</button>' +
       '    <div class="notebook-cover">' +
@@ -1598,6 +1597,9 @@
       '      <div class="diary-edge-zone diary-edge-zone-right" id="diary-zone-right" title="下一页"></div>' +
       "    </div>" +
       "  </div>" +
+      '  <div class="notebook-open-wrap">' +
+      '    <button type="button" class="notebook-open-btn" id="notebook-open">📖 开始阅读</button>' +
+      "  </div>" +
       "</div>";
 
     const notebook = $("notebook");
@@ -1616,6 +1618,7 @@
       notebookOpen = open;
       notebook.classList.toggle("open", open);
       openBtn.classList.toggle("hidden", open);
+      if (openBtn.parentElement) openBtn.parentElement.classList.toggle("hidden", open);
       notebook.setAttribute("aria-expanded", open ? "true" : "false");
     }
 
