@@ -253,6 +253,16 @@
     <button class="lightbox-next" id="lightbox-next" type="button" aria-label="下一张">›</button>
   </div>
 
+  <!-- 通用媒体全屏预览：日记本里的图片/视频点击后放大查看 -->
+  <div class="media-lightbox" id="media-lightbox" role="dialog" aria-modal="true" aria-label="媒体全屏预览" hidden>
+    <button class="media-lightbox-close" id="media-lightbox-close" type="button" aria-label="关闭预览">×</button>
+    <figure class="media-lightbox-body">
+      <img id="media-lightbox-img" src="" alt="" hidden />
+      <video id="media-lightbox-video" controls hidden></video>
+      <figcaption id="media-lightbox-caption"></figcaption>
+    </figure>
+  </div>
+
   <!-- 轻提示气泡：复制邮箱/QQ 成功后显示 -->
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 

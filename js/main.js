@@ -1562,22 +1562,95 @@
     const research = SITE_CONFIG.research || { items: [] };
     const list = $("research-list");
     if (!list) return;
+    const items = research.items || [];
+    if (!items.length) {
+      list.innerHTML = "";
+      return;
+    }
 
-    list.innerHTML = (research.items || [])
-      .map(
-        (item) =>
-          '<div class="timeline-item reveal">' +
-          '  <div class="timeline-card glass-card">' +
-          '    <span class="timeline-time">' + escapeHtml(item.time) + "</span>" +
-          '    <h3 class="timeline-name">' + escapeHtml(item.name) + "</h3>" +
-          '    <p class="timeline-role">' + escapeHtml(item.role || "") + "</p>" +
-          '    <p class="timeline-desc">' + escapeHtml(item.desc || "") + "</p>" +
-          mediaBlock(item.image, item.video, item.name) +
-          tagRow(item.tags) +
-          "  </div>" +
-          "</div>"
-      )
-      .join("");
+    // 日记本翻页状态：当前显示第几条
+    let diaryIndex = 0;
+
+    list.innerHTML =
+      '<div class="diary-shell reveal">' +
+      '  <button type="button" class="diary-edge diary-edge-left" id="diary-prev" aria-label="上一条">‹</button>' +
+      '  <div class="diary-book">' +
+      '    <div class="diary-page" id="diary-page">' +
+      '      <div class="diary-page-left" id="diary-left"></div>' +
+      '      <div class="diary-page-right" id="diary-right"></div>' +
+      '    </div>' +
+      '    <span class="diary-counter" id="diary-counter">1 / ' + items.length + "</span>" +
+      "  </div>" +
+      '  <button type="button" class="diary-edge diary-edge-right" id="diary-next" aria-label="下一条">›</button>' +
+      "</div>";
+
+    const leftEl = $("diary-left");
+    const rightEl = $("diary-right");
+    const pageEl = $("diary-page");
+    const counterEl = $("diary-counter");
+    const prevBtn = $("diary-prev");
+    const nextBtn = $("diary-next");
+
+    // 把一条学习经历渲染到日记本左右页
+    function updateDiary() {
+      const item = items[diaryIndex];
+
+      leftEl.innerHTML =
+        '<span class="diary-time">' + escapeHtml(item.time || "待填写") + "</span>" +
+        '<h3 class="diary-name">' + escapeHtml(item.name || "") + "</h3>" +
+        (item.role ? '<p class="diary-role">' + escapeHtml(item.role) + "</p>" : "") +
+        '<p class="diary-desc">' + escapeHtml(item.desc || "") + "</p>" +
+        tagRow(item.tags);
+
+      // 右页：图片/视频可以同时存在，也可以都没有
+      let mediaHtml = "";
+      if (item.image) {
+        mediaHtml +=
+          '<div class="diary-media" data-media-type="image" data-media-src="' + escapeHtml(item.image) + '" data-media-title="' + escapeHtml(item.name) + '">' +
+          '  <img src="' + escapeHtml(item.image) + '" alt="' + escapeHtml(item.name) + '" loading="lazy" />' +
+          "</div>";
+      }
+      if (item.video) {
+        mediaHtml +=
+          '<div class="diary-media" data-media-type="video" data-media-src="' + escapeHtml(item.video) + '" data-media-title="' + escapeHtml(item.name) + '">' +
+          '  <video controls preload="metadata" src="' + escapeHtml(item.video) + '"></video>' +
+          "</div>";
+      }
+      if (!mediaHtml) {
+        mediaHtml = '<div class="diary-media-empty">🖼️<br />暂未上传图片或视频</div>';
+      }
+      rightEl.innerHTML = mediaHtml;
+
+      counterEl.textContent = (diaryIndex + 1) + " / " + items.length;
+      prevBtn.disabled = diaryIndex <= 0;
+      nextBtn.disabled = diaryIndex >= items.length - 1;
+
+      // 翻页动画：重新触发 CSS 动画
+      pageEl.classList.remove("flip");
+      void pageEl.offsetWidth;
+      pageEl.classList.add("flip");
+    }
+
+    updateDiary();
+
+    // 左边缘：上一条；右边缘：下一条
+    prevBtn.addEventListener("click", () => {
+      if (diaryIndex > 0) { diaryIndex--; updateDiary(); }
+    });
+    nextBtn.addEventListener("click", () => {
+      if (diaryIndex < items.length - 1) { diaryIndex++; updateDiary(); }
+    });
+
+    // 点击图片/视频：全屏放大查看
+    list.addEventListener("click", (event) => {
+      const media = event.target.closest ? event.target.closest(".diary-media") : null;
+      if (!media) return;
+      openMediaLightbox(
+        media.dataset.mediaType,
+        media.dataset.mediaSrc,
+        media.dataset.mediaTitle
+      );
+    });
   }
 
   /* ------------------------------------------------------------------
@@ -1773,6 +1846,44 @@
     updateLightbox();
   }
 
+  /* ---- 通用媒体全屏预览：日记本图片/视频点击放大 ---- */
+  function openMediaLightbox(type, src, title) {
+    const box = $("media-lightbox");
+    const img = $("media-lightbox-img");
+    const video = $("media-lightbox-video");
+    if (!box) return;
+
+    if (type === "video") {
+      video.src = src;
+      video.hidden = false;
+      img.hidden = true;
+      img.removeAttribute("src");
+    } else {
+      img.src = src;
+      img.alt = title || "";
+      img.hidden = false;
+      video.hidden = true;
+      video.pause();
+      video.removeAttribute("src");
+    }
+    $("media-lightbox-caption").textContent = title || "";
+    box.hidden = false;
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeMediaLightbox() {
+    const box = $("media-lightbox");
+    const video = $("media-lightbox-video");
+    if (!box) return;
+    box.hidden = true;
+    if (video) {
+      video.pause();
+      video.removeAttribute("src");
+    }
+    $("media-lightbox-img").removeAttribute("src");
+    document.body.style.overflow = "";
+  }
+
   /* ------------------------------------------------------------------
    * 十、渲染联系我
    * ------------------------------------------------------------------ */
@@ -1958,7 +2069,20 @@
       if (event.target === $("lightbox")) closeLightbox(); // 点击图片外区域关闭
     });
 
+    // 5.5 日记本媒体全屏预览
+    $("media-lightbox-close").addEventListener("click", closeMediaLightbox);
+    $("media-lightbox").addEventListener("click", (event) => {
+      if (event.target === $("media-lightbox")) closeMediaLightbox();
+    });
+
     document.addEventListener("keydown", (event) => {
+      // 通用媒体预览打开时：Esc 关闭
+      const mediaBox = $("media-lightbox");
+      if (mediaBox && !mediaBox.hidden) {
+        if (event.key === "Escape") closeMediaLightbox();
+        return;
+      }
+
       // 灯箱打开时：Esc 关闭，左右方向切换照片
       const box = $("lightbox");
       if (!box.hidden) {
