@@ -82,9 +82,9 @@ const SITE_CONFIG = {
 
     socials: [
       { type: "github", label: "GitHub", url: "https://github.com/jingqiwen" },
-      { type: "bilibili", label: "哔哩哔哩", url: "https://space.bilibili.com/你的UID" },
+      { type: "bilibili", label: "哔哩哔哩", url: "https://space.bilibili.com/34866937?spm_id_from=333.337.0.0" },
       { type: "email", label: "邮箱", url: "mailto:2175414607@qq.com" },
-      { type: "qq", label: "QQ", url: "tencent://message/?uin=你的QQ号" }
+      { type: "qq", label: "QQ", url: "tencent://message/?uin=2175414607" }
     ]
   },
 
@@ -314,8 +314,8 @@ const SITE_CONFIG = {
     cards: [
       { type: "github", label: "GitHub", value: "jingqiwen", url: "https://github.com/jingqiwen", action: "link" },
       { type: "email", label: "邮箱", value: "2175414607@qq.com", url: "", action: "copy" },
-      { type: "qq", label: "QQ", value: "（温景淇还没有写这部分的代码）", url: "", action: "copy" },
-      { type: "bilibili", label: "哔哩哔哩", value: "（温景淇还没有写这部分的代码）", url: "https://space.bilibili.com/你的UID", action: "link" }
+      { type: "qq", label: "QQ", value: "2175414607", url: "", action: "copy" },
+      { type: "bilibili", label: "哔哩哔哩", value: "34866937", url: "https://space.bilibili.com/34866937?spm_id_from=333.337.0.0", action: "link" }
     ]
   },
 
