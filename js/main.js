@@ -1568,28 +1568,60 @@
       return;
     }
 
-    // 日记本翻页状态：当前显示第几条
+    // 日记状态：开始时笔记本是合上的，点“开始阅读”/搭扣打开
     let diaryIndex = 0;
+    let notebookOpen = false;
 
     list.innerHTML =
-      '<div class="diary-shell reveal">' +
-      '  <button type="button" class="diary-edge diary-edge-left" id="diary-prev" aria-label="上一条">‹</button>' +
-      '  <div class="diary-book">' +
-      '    <div class="diary-page" id="diary-page">' +
-      '      <div class="diary-page-left" id="diary-left"></div>' +
-      '      <div class="diary-page-right" id="diary-right"></div>' +
-      '    </div>' +
-      '    <span class="diary-counter" id="diary-counter">1 / ' + items.length + "</span>" +
+      '<div class="notebook-shell reveal">' +
+      '  <button type="button" class="notebook-open-btn" id="notebook-open">📖 开始阅读</button>' +
+      '  <div class="notebook" id="notebook">' +
+      '    <button type="button" class="notebook-close" id="notebook-close" aria-label="合上笔记本">×</button>' +
+      '    <div class="notebook-cover">' +
+      '      <span class="notebook-stitch"></span>' +
+      '      <div class="notebook-cover-title">学习经历</div>' +
+      '      <div class="notebook-cover-subtitle">LEARNING DIARY · ' + items.length + ' PAGES</div>' +
+      '      <div class="notebook-cover-hint">点击右侧搭扣或下方按钮开始阅读</div>' +
+      "    </div>" +
+      '    <button type="button" class="notebook-clasp" id="notebook-clasp" aria-label="打开笔记本"><span class="clasp-dot"></span></button>' +
+      '    <div class="notebook-content" id="notebook-content">' +
+      '      <button type="button" class="diary-edge diary-edge-left" id="diary-prev" aria-label="上一条">‹</button>' +
+      '      <div class="diary-book">' +
+      '        <div class="diary-page" id="diary-page">' +
+      '          <div class="diary-page-left" id="diary-left"></div>' +
+      '          <div class="diary-page-right" id="diary-right"></div>' +
+      "        </div>" +
+      '        <span class="diary-counter" id="diary-counter">1 / ' + items.length + "</span>" +
+      "      </div>" +
+      '      <button type="button" class="diary-edge diary-edge-right" id="diary-next" aria-label="下一条">›</button>' +
+      '      <div class="diary-edge-zone diary-edge-zone-left" id="diary-zone-left" title="上一页"></div>' +
+      '      <div class="diary-edge-zone diary-edge-zone-right" id="diary-zone-right" title="下一页"></div>' +
+      "    </div>" +
       "  </div>" +
-      '  <button type="button" class="diary-edge diary-edge-right" id="diary-next" aria-label="下一条">›</button>' +
       "</div>";
 
+    const notebook = $("notebook");
+    const openBtn = $("notebook-open");
+    const closeBtn = $("notebook-close");
+    const claspBtn = $("notebook-clasp");
     const leftEl = $("diary-left");
     const rightEl = $("diary-right");
     const pageEl = $("diary-page");
     const counterEl = $("diary-counter");
     const prevBtn = $("diary-prev");
     const nextBtn = $("diary-next");
+
+    // 打开 / 合上笔记本（都有 CSS 动画）
+    function setNotebookOpen(open) {
+      notebookOpen = open;
+      notebook.classList.toggle("open", open);
+      openBtn.classList.toggle("hidden", open);
+      notebook.setAttribute("aria-expanded", open ? "true" : "false");
+    }
+
+    openBtn.addEventListener("click", () => setNotebookOpen(true));
+    claspBtn.addEventListener("click", () => setNotebookOpen(true));
+    closeBtn.addEventListener("click", () => setNotebookOpen(false));
 
     // 把一条学习经历渲染到日记本左右页
     function updateDiary() {
@@ -1633,13 +1665,17 @@
 
     updateDiary();
 
-    // 左边缘：上一条；右边缘：下一条
-    prevBtn.addEventListener("click", () => {
+    // 上一页 / 下一页：箭头按钮和书本左右边缘点击均可
+    function goPrev() {
       if (diaryIndex > 0) { diaryIndex--; updateDiary(); }
-    });
-    nextBtn.addEventListener("click", () => {
+    }
+    function goNext() {
       if (diaryIndex < items.length - 1) { diaryIndex++; updateDiary(); }
-    });
+    }
+    prevBtn.addEventListener("click", goPrev);
+    nextBtn.addEventListener("click", goNext);
+    $("diary-zone-left").addEventListener("click", goPrev);
+    $("diary-zone-right").addEventListener("click", goNext);
 
     // 点击图片/视频：全屏放大查看
     list.addEventListener("click", (event) => {
