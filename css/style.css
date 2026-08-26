@@ -2520,7 +2520,16 @@ body.earth-cursor-active * {
 }
 
 .notebook-shell .diary-page-left {
+  position: relative;
   background: repeating-linear-gradient(0deg, rgba(70, 110, 160, 0.07) 0 1px, transparent 1px 34px);
+}
+
+/* 日期写在左页左上角 */
+.notebook-shell .diary-time {
+  position: absolute;
+  top: 20px;
+  left: 26px;
+  margin: 0;
 }
 
 .notebook-shell .diary-page-right {
@@ -2598,6 +2607,7 @@ body.earth-cursor-active * {
   .notebook-shell .diary-page { min-height: 640px; }
   .notebook-shell .diary-page-left,
   .notebook-shell .diary-page-right { padding: 28px 22px; }
+  .notebook-shell .diary-time { top: 14px; left: 16px; }
   .notebook-content .diary-edge { width: 42px; height: 62px; font-size: 20px; }
   .notebook-content .diary-edge-left { left: -8px; }
   .notebook-content .diary-edge-right { right: -8px; }
