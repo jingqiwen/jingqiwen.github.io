@@ -2534,6 +2534,17 @@ body.earth-cursor-active * {
 
 .notebook-shell .diary-page-right {
   background: rgba(255, 255, 255, 0.20);
+  overflow-y: auto;
+}
+
+/* 多张图片时右页可滚动，图片稍微压缩，保证能同时看到几张 */
+.notebook-shell .diary-media img {
+  max-height: 210px;
+  object-fit: cover;
+}
+
+.notebook-shell .diary-media video {
+  max-height: 210px;
 }
 
 /* 强制执行：暗色主题下笔记本纸张也使用和亮色完全一样的米黄色 */

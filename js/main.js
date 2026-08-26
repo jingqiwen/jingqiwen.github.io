@@ -1637,14 +1637,17 @@
         '<p class="diary-desc">' + escapeHtml(item.desc || "") + "</p>" +
         tagRow(item.tags);
 
-      // 右页：图片/视频可以同时存在，也可以都没有
+      // 右页：图片/视频可以同时存在，也可以都没有；支持多张图片
       let mediaHtml = "";
-      if (item.image) {
+      const imageList = (item.images && item.images.length)
+        ? item.images
+        : (item.image ? [item.image] : []);
+      imageList.forEach((src) => {
         mediaHtml +=
-          '<div class="diary-media" data-media-type="image" data-media-src="' + escapeHtml(item.image) + '" data-media-title="' + escapeHtml(item.name) + '">' +
-          '  <img src="' + escapeHtml(item.image) + '" alt="' + escapeHtml(item.name) + '" loading="lazy" />' +
+          '<div class="diary-media" data-media-type="image" data-media-src="' + escapeHtml(src) + '" data-media-title="' + escapeHtml(item.name) + '">' +
+          '  <img src="' + escapeHtml(src) + '" alt="' + escapeHtml(item.name) + '" loading="lazy" />' +
           "</div>";
-      }
+      });
       if (item.video) {
         mediaHtml +=
           '<div class="diary-media" data-media-type="video" data-media-src="' + escapeHtml(item.video) + '" data-media-title="' + escapeHtml(item.name) + '">' +
