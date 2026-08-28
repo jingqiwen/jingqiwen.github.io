@@ -1648,12 +1648,16 @@
           '  <img src="' + escapeHtml(src) + '" alt="' + escapeHtml(item.name) + '" loading="lazy" />' +
           "</div>";
       });
-      if (item.video) {
+      // 视频：支持多个视频（videos 数组）或单个 video
+      const videoList = (item.videos && item.videos.length)
+        ? item.videos
+        : (item.video ? [item.video] : []);
+      videoList.forEach((src) => {
         mediaHtml +=
-          '<div class="diary-media" data-media-type="video" data-media-src="' + escapeHtml(item.video) + '" data-media-title="' + escapeHtml(item.name) + '">' +
-          '  <video controls preload="metadata" src="' + escapeHtml(item.video) + '"></video>' +
+          '<div class="diary-media" data-media-type="video" data-media-src="' + escapeHtml(src) + '" data-media-title="' + escapeHtml(item.name) + '">' +
+          '  <video controls preload="metadata" src="' + escapeHtml(src) + '"></video>' +
           "</div>";
-      }
+      });
       if (!mediaHtml) {
         mediaHtml = '<div class="diary-media-empty">🖼️<br />暂未上传图片或视频</div>';
       }

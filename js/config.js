@@ -215,14 +215,15 @@ const SITE_CONFIG = {
     // 【必改】已预留 6 个学习经历框，按顺序填写即可：
     //   time = 时间；name = 标题；role = 学习方向/角色；desc = 介绍；
     //   images = 图片数组（如 ["assets/C1.jpg", "assets/C2.jpg"]），没有就写 []
+    //   videos = 视频数组（如 ["assets/a.mp4", "assets/b.mp4"]），没有就写 []
     //   image = 单张图片路径（兼容旧写法），没有就写 ""
-    //   video = 视频路径（如 "assets/学习1.mp4"），没有就写 ""
+    //   video = 单个视频路径（兼容旧写法），没有就写 ""
     // 多余的空框可以整段删除，不够就复制整段再加一个。
     items: [
       { time: "2024.9.4 - 2024.9.17", name: "C语言初学习", role: "", desc: "在刚入学军训期间，我在实验室学长的带领下，利用课余时间进行C语言的学习，一边写笔记一边在电脑上实践学习，运用Dev C++软件，并在9月17日完成了我人生中的第一个C语言的完整实践，它的作用是将中国的鞋码与尺寸进行一次转换的算法。当时第一次做，还有很多的bug，但是学长对我进行了耐心的指导，最终完成。", images: ["assets/C1.jpg", "assets/C2.jpg", "assets/C3.jpg"], image: "", video: "", tags: ["C语言", "Dev C++", ] },
       { time: "2024.9.19 - 2024.10.12", name: "通过实验室培训选拔", role: "C语言进阶 · 加入人工智能实验室", desc: "有了第一次的经历，我对C语言有了更深的理解，并且后续做了多个练习，并在10月8日通过了实验室的培训选拔，成功作为我校人工智能实验室的一员。并参观了我系的实验室环境。", images: ["assets/C4.jpg", "assets/C5.jpg", "assets/C6.jpg", "assets/C7.jpg", "assets/C8.jpg"], image: "", video: "assets/C9.mp4", tags: ["C语言", "人工智能实验室", "培训选拔"] },
       { time: "2024.10.13 - 2024.10.22", name: "比赛观摩与51单片机学习", role: "实验室成员 · 赛前观摩学习", desc: "正式成为实验室的一员后，实验室老师派我跟随着学长去打比赛，提前观摩学习，为之后的比赛做准备。在比赛观摩结束后，我学习了很多，对科研比赛有了新的认识，学习了很多的答辩技巧。并在比赛结束一段时间后，进行了51单片机的学习。并且做了一个51单片机的简单小游戏——拆炸弹。", images: ["assets/C511.jpg", "assets/C512.jpg", "assets/C513.jpg", "assets/C514.jpg", "assets/C515.jpg"], image: "", video: "assets/C516.mp4", tags: ["比赛观摩", "51单片机", "拆炸弹", "答辩技巧"] },
-      { time: "待填写", name: "学习经历 · 占位 4/6", role: "（温景淇还没有写这部分的代码）", desc: "（温景淇还没有写这部分的代码）", image: "", video: "", tags: ["待填写"] },
+      { time: "2024.10.24 - 2024.10.31", name: "51小车机械培训与全媒体摄影学习", role: "SolidWorks建模 · 激光雕刻切割 · 摄影后期", desc: "为准备实验室的51智能小车制造培训，我跟随邢凯学长学习机械技能，包括SolidWorks建模、激光雕刻、激光切割，并初步了解3D打印技术。同期，我加入校“院团委全媒体中心”学习摄影，并尝试使用Ps、Pr、Lr、必剪等软件。", images: ["assets/s1.jpg", "assets/sy1.png", "assets/sy2.jpg", "assets/sy3.jpg", "assets/ps1.jpg"], image: "", videos: ["assets/s2.mp4", "assets/j1.mp4", "assets/j2.mp4"], video: "", tags: ["51小车", "SolidWorks", "激光雕刻", "3D打印", "摄影", "全媒体"] },
       { time: "待填写", name: "学习经历 · 占位 5/6", role: "（温景淇还没有写这部分的代码）", desc: "（温景淇还没有写这部分的代码）", image: "", video: "", tags: ["待填写"] },
       { time: "待填写", name: "学习经历 · 占位 6/6", role: "（温景淇还没有写这部分的代码）", desc: "（温景淇还没有写这部分的代码）", image: "", video: "", tags: ["待填写"] }
     ]
