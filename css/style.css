@@ -2743,6 +2743,46 @@ body.earth-cursor-active * {
   color: #b8860b;
 }
 
+/* 奖状悬停预览框 */
+.award-preview {
+  position: fixed;
+  z-index: 330;
+  width: 300px;
+  padding: 8px;
+  border-radius: 16px;
+  background: rgba(12, 24, 40, 0.94);
+  border: 1px solid rgba(212, 175, 55, 0.55);
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.45), 0 0 20px rgba(212, 175, 55, 0.25);
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(8px) scale(0.96);
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+.award-preview.show {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.award-preview img {
+  width: 100%;
+  border-radius: 10px;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  display: block;
+}
+
+.award-preview-text {
+  padding: 8px 6px 2px;
+  text-align: center;
+  color: #ffe8b0;
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+
+.award-preview-text strong { display: block; }
+.award-preview-text small { color: #f3d48a; }
+
 /* 笔记卡片：三列网格 */
 .notes-grid {
   display: grid;

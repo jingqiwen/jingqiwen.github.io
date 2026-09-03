@@ -1730,6 +1730,47 @@
       if (!photo) return;
       openMediaLightbox("image", photo.dataset.mediaSrc, photo.dataset.mediaTitle);
     });
+
+    // 鼠标悬停奖状图片：出现浮动预览框
+    let previewEl = null;
+    grid.addEventListener("mouseover", (event) => {
+      const photo = event.target.closest ? event.target.closest(".award-photo") : null;
+      if (!photo) return;
+      if (!previewEl) {
+        previewEl = document.createElement("div");
+        previewEl.className = "award-preview";
+        document.body.appendChild(previewEl);
+      }
+      const plaque = photo.closest ? photo.closest(".award-plaque") : null;
+      const levelEl = plaque ? plaque.querySelector(".award-level") : null;
+      const level = levelEl ? levelEl.textContent : "";
+      previewEl.innerHTML =
+        '<img src="' + escapeHtml(photo.dataset.mediaSrc) + '" alt="奖状预览" />' +
+        '<div class="award-preview-text">' +
+        "  <strong>" + escapeHtml(photo.dataset.mediaTitle || "") + "</strong>" +
+        (level ? "  <small>" + escapeHtml(level) + "</small>" : "") +
+        "</div>";
+      previewEl.classList.add("show");
+    });
+
+    grid.addEventListener("mousemove", (event) => {
+      if (!previewEl || !previewEl.classList.contains("show")) return;
+      const gap = 18;
+      let left = event.clientX + gap;
+      let top = event.clientY + gap;
+      // 预览框超出屏幕时自动翻到鼠标另一侧
+      const boxW = previewEl.offsetWidth || 280;
+      const boxH = previewEl.offsetHeight || 230;
+      if (left + boxW > window.innerWidth - 10) left = event.clientX - boxW - gap;
+      if (top + boxH > window.innerHeight - 10) top = event.clientY - boxH - gap;
+      previewEl.style.left = Math.max(10, left) + "px";
+      previewEl.style.top = Math.max(10, top) + "px";
+    });
+
+    grid.addEventListener("mouseout", (event) => {
+      const photo = event.target.closest ? event.target.closest(".award-photo") : null;
+      if (!photo && previewEl) previewEl.classList.remove("show");
+    });
   }
 
   /* ------------------------------------------------------------------

@@ -263,7 +263,7 @@ const SITE_CONFIG = {
     // 【必改】已预留 6 个比赛/获奖框：
     //   image = 证书或现场照片路径；video = 比赛视频路径；没有就写 ""
     items: [
-      { time: "待填写", name: "比赛及获奖 · 占位 1/6", level: "（温景淇还没有写这部分的代码）", desc: "（温景淇还没有写这部分的代码）", image: "", video: "", tags: ["待填写"] },
+      { time: "2024", name: "第十九届智能车室外赛智能驾驶赛", level: "省级三等奖", desc: "", image: "assets/jiang1.png", video: "", tags: ["智能车", "室外赛"] },
       { time: "待填写", name: "比赛及获奖 · 占位 2/6", level: "（温景淇还没有写这部分的代码）", desc: "（温景淇还没有写这部分的代码）", image: "", video: "", tags: ["待填写"] },
       { time: "待填写", name: "比赛及获奖 · 占位 3/6", level: "（温景淇还没有写这部分的代码）", desc: "（温景淇还没有写这部分的代码）", image: "", video: "", tags: ["待填写"] },
       { time: "待填写", name: "比赛及获奖 · 占位 4/6", level: "（温景淇还没有写这部分的代码）", desc: "（温景淇还没有写这部分的代码）", image: "", video: "", tags: ["待填写"] },
