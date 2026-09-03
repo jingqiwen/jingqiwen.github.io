@@ -1800,7 +1800,12 @@
 
     grid.addEventListener("mouseout", (event) => {
       const photo = event.target.closest ? event.target.closest(".award-photo") : null;
-      if (!photo && previewEl) previewEl.classList.remove("show");
+      if (!previewEl || !photo) return;
+      // 鼠标确实离开当前奖状图片区域时才隐藏；在图片内部移动不隐藏
+      const related = event.relatedTarget;
+      if (!related || !photo.contains(related)) {
+        previewEl.classList.remove("show");
+      }
     });
   }
 

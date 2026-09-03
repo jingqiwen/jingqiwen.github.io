@@ -268,19 +268,24 @@ const SITE_CONFIG = {
     //   category = 奖项级别："国家级" / "省级" / "校级"
     //   image = 证书/奖状图片路径；没有就写 ""
     items: [
-      { time: "2024", name: "第十九届智能车室外赛智能驾驶赛", level: "省级三等奖", category: "省级", image: "assets/jiang1.png", video: "", tags: ["智能车"] },
-      { time: "2025", name: "大学生嵌入式比赛", level: "校级二等奖", category: "校级", image: "assets/jiang2.png", video: "", tags: ["嵌入式"] },
-      { time: "2025", name: "第十五届节能减排社会实践与科技竞赛", level: "校级二等奖", category: "校级", image: "assets/jiang3.png", video: "", tags: ["节能减排"] },
-      { time: "2025", name: "2025科普达人短视频大赛", level: "校级一等奖", category: "校级", image: "assets/jiang4.jpeg", video: "", tags: ["科普", "短视频"] },
-      { time: "2025", name: "第十五届“挑战杯”大学生创业计划竞赛", level: "省级三等奖", category: "省级", image: "assets/jiang5.png", video: "", tags: ["挑战杯", "创业"] },
-      { time: "2025", name: "第十六届节能减排社会实践与科技竞赛", level: "校三等奖", category: "校级", image: "assets/jiang6.png", video: "", tags: ["节能减排"] },
-      { time: "2025", name: "全国三维数字化创新设计大赛18周年精英联赛", level: "省级一等奖", category: "省级", image: "", video: "", tags: ["三维数字化"] },
-      { time: "2025", name: "全国三维数字化创新设计大赛18周年精英联赛", level: "省级特等奖", category: "省级", image: "", video: "", tags: ["三维数字化"] },
+      // ---- 国家级（含金量从高到低） ----
       { time: "2025", name: "全国三维数字化创新设计大赛18周年精英联赛", level: "国家级二等奖", category: "国家级", image: "", video: "", tags: ["三维数字化"] },
       { time: "2025", name: "全国三维数字化创新设计大赛18周年精英联赛", level: "国家级三等奖", category: "国家级", image: "", video: "", tags: ["三维数字化"] },
       { time: "2026", name: "2026年第九届中国高校智能机器人创意大赛", level: "国家三等奖", category: "国家级", image: "assets/jiang7.jpg", video: "", tags: ["智能机器人"] },
+
+      // ---- 省级（特等奖在前，再按一、二、三等奖排序） ----
       { time: "2026", name: "第九届中国高校智能机器人创意大赛山西选拔赛", level: "省级特等奖", category: "省级", image: "assets/jiang8.png", video: "", tags: ["智能机器人"] },
+      { time: "2025", name: "全国三维数字化创新设计大赛18周年精英联赛", level: "省级特等奖", category: "省级", image: "", video: "", tags: ["三维数字化"] },
+      { time: "2025", name: "全国三维数字化创新设计大赛18周年精英联赛", level: "省级一等奖", category: "省级", image: "", video: "", tags: ["三维数字化"] },
+      { time: "2024", name: "第十九届智能车室外赛智能驾驶赛", level: "省级三等奖", category: "省级", image: "assets/jiang1.png", video: "", tags: ["智能车"] },
+      { time: "2025", name: "第十五届“挑战杯”大学生创业计划竞赛", level: "省级三等奖", category: "省级", image: "assets/jiang5.png", video: "", tags: ["挑战杯", "创业"] },
       { time: "2025", name: "中国智能装备创新设计赛", level: "省级三等奖", category: "省级", image: "assets/jiang9.png", video: "", tags: ["智能装备"] },
+
+      // ---- 校级（一等奖最前，再按二、三等奖排序） ----
+      { time: "2025", name: "2025科普达人短视频大赛", level: "校级一等奖", category: "校级", image: "assets/jiang4.jpeg", video: "", tags: ["科普", "短视频"] },
+      { time: "2025", name: "大学生嵌入式比赛", level: "校级二等奖", category: "校级", image: "assets/jiang2.png", video: "", tags: ["嵌入式"] },
+      { time: "2025", name: "第十五届节能减排社会实践与科技竞赛", level: "校级二等奖", category: "校级", image: "assets/jiang3.png", video: "", tags: ["节能减排"] },
+      { time: "2025", name: "第十六届节能减排社会实践与科技竞赛", level: "校三等奖", category: "校级", image: "assets/jiang6.png", video: "", tags: ["节能减排"] },
       { time: "2025", name: "山西省高等学校大学生创新训练计划", level: "校级", category: "校级", image: "", video: "", tags: ["创新训练"] }
     ]
   },
