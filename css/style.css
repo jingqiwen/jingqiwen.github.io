@@ -2670,10 +2670,10 @@ body.earth-cursor-active * {
 .award-level { color: var(--primary-strong); font-size: 0.86rem; font-weight: 600; margin-top: 4px; }
 .award-desc { color: var(--text-secondary); font-size: 0.92rem; margin-top: 10px; }
 
-/* ---------- 奖状墙：一块一块的证书/奖状照片 ---------- */
+/* ---------- 奖状墙：一行三个方块，每块图片在上、比赛名和奖项在下 ---------- */
 .awards-wall {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 24px;
 }
 
@@ -3309,6 +3309,7 @@ body.earth-cursor-active * {
 
   /* 获奖与笔记改为单列 */
   .awards-grid { grid-template-columns: 1fr; }
+  .awards-wall { grid-template-columns: repeat(2, 1fr); }
   .notes-grid { grid-template-columns: 1fr; }
 
   /* 银河目录改为左下角悬浮 + 底部弹出面板 */
@@ -3366,6 +3367,7 @@ body.earth-cursor-active * {
 
   .gallery-grid { grid-template-columns: 1fr; }
   .contact-grid { grid-template-columns: 1fr; }
+  .awards-wall { grid-template-columns: 1fr; }
 
   .scroll-text { display: none; }
 }
