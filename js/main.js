@@ -1705,13 +1705,26 @@
   function renderAwards() {
     const awards = SITE_CONFIG.awards || { items: [] };
     const grid = $("awards-grid");
+    const filterBar = $("award-filters");
     if (!grid) return;
+
+    // 奖项分类筛选：所有奖项 / 国家级 / 省级 / 校级
+    const filters = awards.filters || ["所有奖项", "国家级奖项", "省级奖项", "校级奖项"];
+    if (filterBar) {
+      filterBar.innerHTML = filters
+        .map(
+          (filter, index) =>
+            '<button type="button" class="filter-chip' + (index === 0 ? " active" : "") + '" data-award-filter="' +
+            escapeHtml(filter) + '">' + escapeHtml(filter) + "</button>"
+        )
+        .join("");
+    }
 
     // 奖状墙：每块 = 一张奖状/证书图片 + 比赛名称 + 获得奖项
     grid.innerHTML = (awards.items || [])
       .map(
         (item) =>
-          '<article class="award-plaque reveal">' +
+          '<article class="award-plaque reveal" data-award-category="' + escapeHtml(item.category || "其他") + '">' +
           '  <div class="award-photo" data-media-type="image" data-media-src="' + escapeHtml(item.image || "assets/award-placeholder.svg") + '" data-media-title="' + escapeHtml(item.name) + '">' +
           '    <img src="' + escapeHtml(item.image || "assets/award-placeholder.svg") + '" alt="' + escapeHtml(item.name) + '" loading="lazy" />' +
           '    <span class="award-time-tag">' + escapeHtml(item.time || "") + "</span>" +
@@ -1723,6 +1736,24 @@
           "</article>"
       )
       .join("");
+
+    // 筛选逻辑
+    if (filterBar) {
+      filterBar.querySelectorAll(".filter-chip").forEach((chip) => {
+        chip.addEventListener("click", () => {
+          filterBar.querySelectorAll(".filter-chip").forEach((c) => c.classList.remove("active"));
+          chip.classList.add("active");
+          const filter = chip.dataset.awardFilter;
+          grid.querySelectorAll(".award-plaque").forEach((plaque) => {
+            let show = filter === "所有奖项";
+            if (filter === "国家级奖项") show = plaque.dataset.awardCategory === "国家级";
+            if (filter === "省级奖项") show = plaque.dataset.awardCategory === "省级";
+            if (filter === "校级奖项") show = plaque.dataset.awardCategory === "校级";
+            plaque.style.display = show ? "" : "none";
+          });
+        });
+      });
+    }
 
     // 点击奖状图片：全屏放大查看
     grid.addEventListener("click", (event) => {
