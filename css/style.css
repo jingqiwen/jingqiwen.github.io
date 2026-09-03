@@ -3547,6 +3547,31 @@ body.earth-cursor-active * {
   text-align: center;
 }
 
+/* 模式角标行：手动游玩模式 + WASD 键盘提示 */
+.snake-mode-row {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 2px 0 8px;
+  flex-wrap: wrap;
+}
+
+.snake-mode-row .snake-mode-badge { margin: 0; }
+
+.manual-key-hint {
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: rgba(255, 209, 102, 0.16);
+  border: 1px dashed rgba(255, 190, 60, 0.55);
+  color: #9a6b00;
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+:root[data-theme="dark"] .manual-key-hint { color: #ffd166; }
+
 /* 模式角标：放在屏幕外、游戏机顶部，字体大且醒目 */
 .snake-mode-badge {
   position: relative;

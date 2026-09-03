@@ -476,7 +476,10 @@
       '      <div class="wisdom-hint" id="wisdom-hint">' + escapeHtml(config.starHint || "点亮条件：玩家先将贪吃蛇通关失败一次，随后再通关成功一次") + "</div>" +
       "    </div>" +
       '    <div class="pass-rule">通关条件：贪吃蛇长度达到 ' + Number(config.passLength || 15) + ' 即视为游戏通关</div>' +
-      '    <div class="snake-mode-badge" id="snake-mode">AI插件托管中</div>' +
+      '    <div class="snake-mode-row">' +
+      '      <div class="snake-mode-badge" id="snake-mode">AI插件托管中</div>' +
+      '      <span class="manual-key-hint" id="manual-key-hint">按下按键W、S、A、D控制</span>' +
+      "    </div>" +
       '    <div class="console-screen">' +
       '      <div class="screen-vent vent-1"></div><div class="screen-vent vent-2"></div>' +
       '      <div class="snake-canvas-wrap" id="snake-wrap"><canvas id="snake-canvas" aria-label="贪吃蛇小游戏画布"></canvas></div>' +
@@ -523,6 +526,7 @@
       starEl: $("wisdom-star"),
       hintEl: $("wisdom-hint"),
       modeEl: $("snake-mode"),
+      keyHintEl: $("manual-key-hint"),
       cardEl: $("hero-right") ? $("hero-right").querySelector(".snake-card") : null,
       config: config
     });
@@ -544,6 +548,7 @@
     this.starEl = options.starEl;
     this.hintEl = options.hintEl;
     this.modeEl = options.modeEl;
+    this.keyHintEl = options.keyHintEl;
     this.cardEl = options.cardEl;
     this.config = options.config || {};
 
@@ -835,6 +840,10 @@
   SnakeGame.prototype.updateModeUI = function () {
     this.autoBtn.textContent = this.mode === "auto" ? "自动游动" : "手动模式";
     this.autoBtn.classList.toggle("active", this.mode === "auto");
+    // 手动模式按钮旁边的键盘操作提示
+    if (this.keyHintEl) {
+      this.keyHintEl.style.display = this.mode === "manual" ? "" : "none";
+    }
     // 模式角标放在游戏机内部屏幕之外，不遮挡游戏画面
     if (this.modeEl) {
       this.modeEl.textContent = this.mode === "auto" ? "AI插件托管中" : "手动游玩模式";
