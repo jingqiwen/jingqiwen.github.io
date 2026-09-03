@@ -27,9 +27,9 @@
     renderSectionHeads();  // 各版块标题
     renderAbout();         // 关于我 + 教育经历
     renderSkills();        // 技能（单列进度条）
-    renderResearch();      // 学习经历
-    renderProjects();      // 项目成果展示及资料
-    renderAwards();        // 参加比赛及获奖情况（在项目成果之后）
+    renderAwards();        // 参加比赛及获奖情况（奖状墙，位于学习经历之前）
+    renderProjects();      // 项目成果展示及资料（位于奖项与学习经历之间）
+    renderResearch();      // 学习经历（搭扣日记本）
     renderNotes();         // 我的笔记
     renderGallery();       // 光影瞬间照片墙
     renderContact();       // 联系我
@@ -1707,22 +1707,29 @@
     const grid = $("awards-grid");
     if (!grid) return;
 
+    // 奖状墙：每块 = 一张奖状/证书图片 + 比赛名称 + 获得奖项
     grid.innerHTML = (awards.items || [])
       .map(
         (item) =>
-          '<article class="award-card glass-card reveal">' +
-          '  <div class="award-top">' +
-          '    <span class="award-icon">🏆</span>' +
-          '    <span class="award-time">' + escapeHtml(item.time) + "</span>" +
+          '<article class="award-plaque reveal">' +
+          '  <div class="award-photo" data-media-type="image" data-media-src="' + escapeHtml(item.image || "assets/award-placeholder.svg") + '" data-media-title="' + escapeHtml(item.name) + '">' +
+          '    <img src="' + escapeHtml(item.image || "assets/award-placeholder.svg") + '" alt="' + escapeHtml(item.name) + '" loading="lazy" />' +
+          '    <span class="award-time-tag">' + escapeHtml(item.time || "") + "</span>" +
           "  </div>" +
-          '  <h3 class="award-name">' + escapeHtml(item.name) + "</h3>" +
-          '  <p class="award-level">' + escapeHtml(item.level || "") + "</p>" +
-          '  <p class="award-desc">' + escapeHtml(item.desc || "") + "</p>" +
-          mediaBlock(item.image, item.video, item.name) +
-          tagRow(item.tags) +
+          '  <div class="award-caption">' +
+          '    <h3 class="award-name">' + escapeHtml(item.name) + "</h3>" +
+          '    <p class="award-level">' + escapeHtml(item.level || "") + "</p>" +
+          "  </div>" +
           "</article>"
       )
       .join("");
+
+    // 点击奖状图片：全屏放大查看
+    grid.addEventListener("click", (event) => {
+      const photo = event.target.closest ? event.target.closest(".award-photo") : null;
+      if (!photo) return;
+      openMediaLightbox("image", photo.dataset.mediaSrc, photo.dataset.mediaTitle);
+    });
   }
 
   /* ------------------------------------------------------------------

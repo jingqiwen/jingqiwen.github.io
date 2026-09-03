@@ -36,9 +36,9 @@ const SITE_CONFIG = {
       { id: "home",     text: "首页",               icon: "🟡", bar: true },   // 金星
       { id: "about",    text: "关于我",             icon: "♌",  bar: true },   // 狮子座
       { id: "skills",   text: "掌握技能",           icon: "🔴", bar: false },  // 火星
-      { id: "research", text: "学习经历",           icon: "🟤", bar: true },   // 木星
-      { id: "projects", text: "项目成果展示及资料", icon: "🛰️", bar: true },  // 人造卫星
       { id: "awards",   text: "比赛及获奖",         icon: "🪐", bar: true },   // 土星
+      { id: "projects", text: "项目成果展示及资料", icon: "🛰️", bar: true },  // 人造卫星
+      { id: "research", text: "学习经历",           icon: "🟤", bar: true },   // 木星
       { id: "notes",    text: "我的笔记",           icon: "🌕", bar: false },  // 月球
       { id: "gallery",  text: "光影瞬间",           icon: "☄️", bar: false },  // 彗星
       { id: "contact",  text: "联系我",             icon: "🔵", bar: true }    // 海王星

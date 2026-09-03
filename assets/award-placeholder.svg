@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600">
+  <!-- 奖状墙占位图：证书风格，上传真实奖状照片后替换 -->
+  <rect width="800" height="600" fill="#fdf8ec"/>
+  <rect x="34" y="30" width="732" height="540" fill="none" stroke="#b8860b" stroke-width="8" rx="10"/>
+  <rect x="54" y="50" width="692" height="500" fill="none" stroke="#d4af37" stroke-width="2" rx="8"/>
+  <text x="400" y="250" text-anchor="middle" font-family="Microsoft YaHei, sans-serif" font-size="64" font-weight="bold" fill="#b8860b">奖 状</text>
+  <text x="400" y="330" text-anchor="middle" font-family="Microsoft YaHei, sans-serif" font-size="26" fill="#8a6a2a">比赛及获奖情况占位</text>
+  <text x="400" y="390" text-anchor="middle" font-family="Microsoft YaHei, sans-serif" font-size="22" fill="#a58a4a">请上传奖状/证书照片后替换</text>
+  <circle cx="400" cy="130" r="46" fill="#d4af37"/>
+  <text x="400" y="150" text-anchor="middle" font-size="56">🏆</text>
+</svg>
