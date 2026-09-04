@@ -269,14 +269,14 @@ const SITE_CONFIG = {
     //   image = 证书/奖状图片路径；没有就写 ""
     items: [
       // ---- 国家级（含金量从高到低） ----
-      { time: "2025", name: "全国三维数字化创新设计大赛18周年精英联赛", level: "国家级二等奖", category: "国家级", image: "", video: "", tags: ["三维数字化"] },
-      { time: "2025", name: "全国三维数字化创新设计大赛18周年精英联赛", level: "国家级三等奖", category: "国家级", image: "", video: "", tags: ["三维数字化"] },
+      { time: "2025", name: "全国三维数字化创新设计大赛18周年精英联赛", level: "国家级二等奖", category: "国家级", image: "assets/guo2.jpg", video: "", tags: ["三维数字化"] },
+      { time: "2025", name: "全国三维数字化创新设计大赛18周年精英联赛", level: "国家级三等奖", category: "国家级", image: "assets/guo3.jpg", video: "", tags: ["三维数字化"] },
       { time: "2026", name: "2026年第九届中国高校智能机器人创意大赛", level: "国家三等奖", category: "国家级", image: "assets/jiang7.jpg", video: "", tags: ["智能机器人"] },
 
       // ---- 省级（特等奖在前，再按一、二、三等奖排序） ----
       { time: "2026", name: "第九届中国高校智能机器人创意大赛山西选拔赛", level: "省级特等奖", category: "省级", image: "assets/jiang8.png", video: "", tags: ["智能机器人"] },
-      { time: "2025", name: "全国三维数字化创新设计大赛18周年精英联赛", level: "省级特等奖", category: "省级", image: "", video: "", tags: ["三维数字化"] },
-      { time: "2025", name: "全国三维数字化创新设计大赛18周年精英联赛", level: "省级一等奖", category: "省级", image: "", video: "", tags: ["三维数字化"] },
+      { time: "2025", name: "全国三维数字化创新设计大赛18周年精英联赛", level: "省级特等奖", category: "省级", image: "assets/shengte.jpg", video: "", tags: ["三维数字化"] },
+      { time: "2025", name: "全国三维数字化创新设计大赛18周年精英联赛", level: "省级一等奖", category: "省级", image: "assets/shengyi.jpg", video: "", tags: ["三维数字化"] },
       { time: "2024", name: "第十九届智能车室外赛智能驾驶赛", level: "省级三等奖", category: "省级", image: "assets/jiang1.png", video: "", tags: ["智能车"] },
       { time: "2025", name: "第十五届“挑战杯”大学生创业计划竞赛", level: "省级三等奖", category: "省级", image: "assets/jiang5.png", video: "", tags: ["挑战杯", "创业"] },
       { time: "2025", name: "中国智能装备创新设计赛", level: "省级三等奖", category: "省级", image: "assets/jiang9.png", video: "", tags: ["智能装备"] },
